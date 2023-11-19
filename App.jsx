@@ -1,149 +1,212 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import {
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-    useColorScheme,
-} from "react-native";
+import React, { useState, useRef } from "react";
+import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
 import Layout from "./Components/layout/layout";
 import { months } from "./Components/data/data";
 import Day from "./Components/calendar/day";
-import * as Font from "expo-font";
-
-const fetchFonts = () => {
-    return Font.loadAsync({
-        Poppins: require("./assets/fonts/Poppins/Poppins-Regular.ttf"),
-    });
-};
+import { FlatList } from "react-native-bidirectional-infinite-scroll";
+import FlatListRefContext from "./Components/context/flatListContext";
 
 export default function App() {
-    const [currentMonth, setCurrentMonth] = useState(12);
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const [dataLoaded, setDataLoaded] = useState(false);
+    const [monthsLoaded, setMonthsLoaded] = useState([1]);
 
-    const getDaysInMonth = (month, year) => {
-        const days = new Date(year, month, 0).getDate();
-        console.log();
-        return days;
+    const flatListRef = useRef(null);
+
+    const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
+
+    const getDayOffset = (month, year, day) => {
+        let dayOfWeek = new Date(year, month - 1, day).getDay() - 1;
+        return dayOfWeek === -1 ? 6 : dayOfWeek;
     };
 
-    const getStartingDayOffset = (month, year) => {
-        let startingDay = new Date(year, month - 1, 1).getDay() - 1; // Adjust for Monday (0-6)
-        if (startingDay === -1) startingDay = 6; // Adjust Sunday to 6 (Saturday)
-        return startingDay;
+    const getStartingDayOffset = (month, year) => getDayOffset(month, year, 1);
+
+    const getEndingDayOffset = (month, year) =>
+        getDayOffset(month, year, getDaysInMonth(month, year));
+
+    const decideMonth = (month, offset) => {
+        const adjustedMonth = month + offset;
+        if (adjustedMonth === 0) return 12;
+        if (adjustedMonth === 13) return 1;
+        return adjustedMonth;
     };
 
-    const getEndingDayOffset = (month, year) => {
+    const decideMonthForArray = (month) => {
+        const adjustedMonth = month;
+        if (adjustedMonth === 12) return 11;
+        if (adjustedMonth === -1) return 0;
+        return adjustedMonth - 1;
+    };
+
+    const renderDays = (month, year) => {
         const daysInMonth = getDaysInMonth(month, year);
-        let endingDay = new Date(year, month - 1, daysInMonth).getDay() - 1; // Adjust for Monday (0-6)
-        if (endingDay === -1) endingDay = 6; // Adjust Sunday to 6 (Saturday)
-        return endingDay;
-    };
+        const startOffset = getStartingDayOffset(month, year);
+        const endOffset = getEndingDayOffset(month, year);
 
-    const renderDays = () => {
-        //make an array like currentMonthArray, but it is for January in the current year
+        const days = [];
 
-        const currentMonthArray = Array.from(
-            { length: getDaysInMonth(currentMonth, currentYear) },
-            (_, i) => {
-                return { day: i + 1, month: currentMonth };
-            }
-        );
+        // Start month
+        for (let i = 0; i < startOffset; i++) {
+            const yearOffset = month === 1 ? 1 : 0;
+            const newmonth = new Date(year - yearOffset, month, 0);
 
-        const decideMonth = (month) => {
-            if (month === 0) {
-                return 12;
-            } else if (month === 13) {
-                return 1;
-            } else {
-                return month;
-            }
-        };
-
-        const decideMonthArray = (month) => {
-            if (month === -1) {
-                return 11;
-            } else if (month === 12) {
-                return 0;
-            } else {
-                return month;
-            }
-        };
-
-        const currMonthAndBits = () => {
-            const startOffset = getStartingDayOffset(currentMonth, currentYear);
-            const endOffset = getEndingDayOffset(currentMonth, currentYear);
-
-            const startMonth = Array.from({ length: startOffset }, (_, i) => {
-                const yearOffset = currentMonth === 1 ? 1 : 0;
-                const month = new Date(
-                    currentYear - yearOffset,
-                    currentMonth,
-                    0
-                );
-                return {
-                    day: getDaysInMonth(month.getMonth(), currentYear) - i,
-                    month: decideMonth(currentMonth - 1),
-                };
-            }).reverse();
-
-            const endMonth = Array.from({ length: endOffset }, (_, i) => {
-                const month = new Date(currentYear, currentMonth, 1);
-                return {
-                    day: i + 1,
-                    month: month.getMonth() + 1,
-                };
+            days.push({
+                day: getDaysInMonth(newmonth.getMonth(), year) - i,
+                month: decideMonth(newmonth.getMonth() - 1, 1),
+                year: year,
             });
+        }
+        days.reverse();
 
-            return [...startMonth, ...currentMonthArray, ...endMonth];
-        };
+        // Current month
+        for (let i = 1; i <= daysInMonth; i++) {
+            days.push({ day: i, month: month, year: year });
+        }
+
+        // End month
+        for (let i = 1; i <= endOffset; i++) {
+            const newmonth = new Date(year, month, 1);
+            days.push({
+                day: i,
+                month: decideMonth(newmonth.getMonth(), 1),
+                year: year,
+            });
+        }
+
+        const ITEM_HEIGHT = 59; // height of each item
+        const NUM_COLUMNS = 7;
+        const numRows = Math.ceil(days.length / NUM_COLUMNS);
+
+        // Calculate the total height of the FlatList
+        const totalHeight = numRows * ITEM_HEIGHT;
 
         return (
-            <Pressable
+            <View
                 style={{
-                    height: "100%",
-                    flex: 1,
-                    justifyContent: "space-around",
                     alignItems: "center",
+                    marginTop: 150,
                 }}
             >
                 <View>
                     <Text style={[styles.textDark, styles.bigText]}>
-                        {months[decideMonthArray(currentMonth - 1)].fullName}
+                        {months[decideMonthForArray(month)].fullName}
                     </Text>
                 </View>
                 <FlatList
                     renderItem={({ item }) => (
                         <Day
                             day={item.day}
-                            isCurrentMonth={item.month === currentMonth}
+                            isCurrentMonth={item.month === month}
                             month={item.month}
+                            isToday={
+                                item.day === new Date().getDate() &&
+                                item.month === new Date().getMonth() + 1 &&
+                                item.year === new Date().getFullYear()
+                            }
                         />
                     )}
-                    data={currMonthAndBits()}
+                    data={days}
                     keyExtractor={(item, index) => index.toString()}
                     numColumns={7}
                     style={{
                         flexGrow: 0,
                     }}
+                    scrollEnabled={false}
+                    getItemLayout={(data, index) => ({
+                        length: totalHeight,
+                        offset: totalHeight * index,
+                        index,
+                    })}
+                    windowSize={21} // tweak this value as needed
+                    maxToRenderPerBatch={20} // tweak this value as needed
+                    initialNumToRender={14} // tweak this value as needed
                 />
-                <View></View>
-            </Pressable>
+            </View>
         );
     };
 
+    const onStartReached = () => {
+        console.log("onStartReached");
+        // set the monthsLoaded everytime, but if months loaded is like over 5, cut off the last one too after adding the new one
+        setMonthsLoaded((prev) => {
+            const newMonths = [prev[0] - 1, ...prev];
+            if (newMonths.length > 5) {
+                newMonths.pop();
+            }
+            return newMonths;
+        });
+    };
+
+    const onEndReached = () => {
+        console.log("onEndReached");
+        // set the monthsLoaded everytime, but if months loaded is like over 5, cut off the last one too after adding the new one
+        setMonthsLoaded((prev) => {
+            const newMonths = [...prev, prev[prev.length - 1] + 1];
+            if (newMonths.length > 5) {
+                newMonths.shift();
+            }
+            return newMonths;
+        });
+    };
+
     return (
-        <View style={[styles.container, styles.backgroundDark]}>
-            <Layout
-                currentMonth={currentMonth}
-                setCurrentMonth={setCurrentMonth}
-            >
-                {renderDays()}
-            </Layout>
-        </View>
+        <FlatListRefContext.Provider
+            value={{ flatListRef, setMonthsLoaded, monthsLoaded }}
+        >
+            <View style={[styles.container, styles.backgroundDark]}>
+                <Layout
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                >
+                    <Text>{monthsLoaded[monthsLoaded.length - 1] === 12}</Text>
+                    <FlatList
+                        ref={flatListRef}
+                        data={monthsLoaded}
+                        keyExtractor={(item, index) => `${item}-${currentYear}`}
+                        renderItem={({ item }) => renderDays(item, currentYear)}
+                        maxToRenderPerBatch={20} // tweak this value as needed
+                        initialNumToRender={1} // tweak this value as needed
+                        scrollEnabled={true}
+                        showDefaultLoadingIndicators={
+                            monthsLoaded[monthsLoaded.length - 1] === 12
+                        }
+                        ListFooterComponent={() => {
+                            return (
+                                monthsLoaded[monthsLoaded.length - 1] ===
+                                    12 && (
+                                    <View
+                                        style={{
+                                            flex: 1,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                fontSize: 50,
+                                                fontWeight: "bold",
+                                                color: "white",
+                                            }}
+                                        >
+                                            {currentYear + 1}
+                                        </Text>
+                                    </View>
+                                )
+                            );
+                        }}
+                        ListFooterComponentStyle={{
+                            height: 100,
+                            backgroundColor:
+                                monthsLoaded[monthsLoaded.length - 1] === 12
+                                    ? "rgba(255, 255, 255, 0.2)"
+                                    : "transparent",
+                        }}
+                    />
+                </Layout>
+            </View>
+        </FlatListRefContext.Provider>
     );
 }
 

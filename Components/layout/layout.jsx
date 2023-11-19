@@ -1,22 +1,18 @@
-import React from "react";
-import { View, StyleSheet, Text, Animated, Easing } from "react-native";
+import React, { useRef, useEffect } from "react";
+import {
+    View,
+    StyleSheet,
+    Text,
+    Animated,
+    ScrollView,
+    Dimensions,
+    PanResponder,
+} from "react-native";
 import { months } from "../data/data.js";
 import { MonthBox } from "./monthBox.jsx";
+import Selector from "./selector.jsx";
 
 const Layout = ({ children, currentMonth, setCurrentMonth }) => {
-    const topPosition = React.useRef(
-        new Animated.Value(currentMonth * 50 - 50)
-    ).current;
-
-    // Animate the change of the top property
-    React.useEffect(() => {
-        Animated.timing(topPosition, {
-            toValue: currentMonth * 50 - 50,
-            duration: 500, // duration of the animation, in milliseconds
-            useNativeDriver: false, // change to true if you're animating opacity or transform
-            easing: Easing.inOut(Easing.ease),
-        }).start();
-    }, [currentMonth]);
     return (
         <View style={styles.container}>
             <View style={styles.topBar}>
@@ -26,6 +22,15 @@ const Layout = ({ children, currentMonth, setCurrentMonth }) => {
                 </View>
             </View>
             <View style={styles.sidebar}>
+                <View
+                    style={{
+                        flex: 5,
+                        width: "100%",
+                        height: "100%",
+                    }}
+                >
+                    {children}
+                </View>
                 <View style={styles.monthsContainer}>
                     {months.map((month) => (
                         <MonthBox
@@ -34,11 +39,8 @@ const Layout = ({ children, currentMonth, setCurrentMonth }) => {
                             setCurrentMonth={setCurrentMonth}
                         />
                     ))}
-                    <Animated.View
-                        style={[styles.selector, { top: topPosition, left: 0 }]}
-                    ></Animated.View>
+                    <Selector />
                 </View>
-                <View style={styles.childrenContainer}>{children}</View>
             </View>
         </View>
     );
@@ -52,11 +54,12 @@ const styles = StyleSheet.create({
     },
     selector: {
         flex: 1,
-        width: 60,
-        height: 50,
-        backgroundColor: "#F05941",
+        height: "8.33%",
+
         position: "absolute",
-        zIndex: 1,
+        zIndex: 3,
+        width: "100%",
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
     },
     appSquare: {
         flex: 1,
@@ -90,16 +93,10 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "space-around",
         alignItems: "center",
-        borderRightWidth: 1,
-        borderRightColor: "white",
+
         position: "relative",
-        backgroundColor: "#872341",
     },
-    childrenContainer: {
-        flex: 5,
-        justifyContent: "center",
-        alignItems: "center",
-    },
+    childrenContainer: {},
     text: {
         color: "white",
         margin: 5,

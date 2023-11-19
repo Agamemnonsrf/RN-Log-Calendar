@@ -9,7 +9,7 @@ import {
 
 export const MonthBox = ({ month, setCurrentMonth }) => {
     return (
-        <TouchableHighlight
+        <Pressable
             style={[styles.container]}
             onPressIn={() => setCurrentMonth(month.id)}
             underlayColor="#DDDDDD"
@@ -23,7 +23,7 @@ export const MonthBox = ({ month, setCurrentMonth }) => {
             >
                 {month.name}
             </Text>
-        </TouchableHighlight>
+        </Pressable>
     );
 };
 

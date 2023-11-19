@@ -1,15 +1,15 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-export const Day = ({ day, isCurrentMonth, month }) => {
-    const isToday = () => {
-        const today = new Date();
-        return (
-            today.getDate() === day &&
-            today.getMonth() + 1 === month &&
-            today.getFullYear() === new Date().getFullYear()
-        );
-    };
+export const Day = ({ day, isCurrentMonth, month, isToday }) => {
+    // const isToday = () => {
+    //     const today = new Date();
+    //     return (
+    //         today.getDate() === day &&
+    //         today.getMonth() + 1 === month &&
+    //         today.getFullYear() === new Date().getFullYear()
+    //     );
+    // };
     return (
         <View
             style={[
@@ -18,7 +18,7 @@ export const Day = ({ day, isCurrentMonth, month }) => {
                     borderColor: isCurrentMonth
                         ? "rgba(255,255,255,0.7)"
                         : "rgba(255,255,255,0.3)",
-                    backgroundColor: isToday() ? "#F05941" : "transparent",
+                    backgroundColor: isToday ? "#F05941" : "transparent",
                 },
             ]}
         >
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Day;
+export default memo(Day);

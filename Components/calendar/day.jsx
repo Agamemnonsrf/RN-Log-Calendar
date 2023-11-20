@@ -29,13 +29,6 @@ export const Day = ({ day, isCurrentMonth, month, isToday }) => {
             >
                 {day}
             </Text>
-            <Text
-                style={{
-                    color: isCurrentMonth ? "white" : "rgba(255,255,255,0.5)",
-                }}
-            >
-                {month}
-            </Text>
         </View>
     );
 };

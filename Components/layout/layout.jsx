@@ -15,12 +15,6 @@ import Selector from "./selector.jsx";
 const Layout = ({ children, currentMonth, setCurrentMonth }) => {
     return (
         <View style={styles.container}>
-            <View style={styles.topBar}>
-                <View style={styles.appSquare}></View>
-                <View style={styles.yearBar}>
-                    <Text style={[styles.text, { fontSize: 34 }]}>2023</Text>
-                </View>
-            </View>
             <View style={styles.sidebar}>
                 <View
                     style={{

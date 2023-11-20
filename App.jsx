@@ -1,6 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useRef } from "react";
-import { StyleSheet, Text, View, ScrollView, Dimensions } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    Dimensions,
+    PanResponder,
+    Animated,
+} from "react-native";
 import Layout from "./Components/layout/layout";
 import { months } from "./Components/data/data";
 import Day from "./Components/calendar/day";
@@ -11,6 +19,47 @@ export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [monthsLoaded, setMonthsLoaded] = useState([1]);
+    const pan = useRef(new Animated.ValueXY()).current;
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderMove: Animated.event(
+                [null, { dx: pan.x, dy: pan.y }],
+                { useNativeDriver: false }
+            ),
+            onPanResponderRelease: () => {
+                if (pan.x._value > 150) {
+                    setCurrentYear((prevYear) => prevYear - 1);
+                } else if (pan.x._value < -150) {
+                    setCurrentYear((prevYear) => prevYear + 1);
+                }
+                Animated.spring(pan, {
+                    toValue: { x: 0, y: 0 },
+                    useNativeDriver: false,
+                }).start();
+            },
+        })
+    ).current;
+
+    const trailStyle = {
+        position: "absolute",
+        height: 50,
+        backgroundColor: "aliceblue",
+        left: pan.x.interpolate({
+            inputRange: [-1, 0, 1],
+            outputRange: ["0%", "0%", "100%"],
+            extrapolate: "clamp",
+        }),
+        right: pan.x.interpolate({
+            inputRange: [-1, 0, 1],
+            outputRange: ["100%", "0%", "0%"],
+            extrapolate: "clamp",
+        }),
+    };
+
+    useEffect(() => {
+        pan.setValue({ x: 0, y: 0 });
+    }, [currentYear]);
 
     const flatListRef = useRef(null);
 
@@ -85,10 +134,35 @@ export default function App() {
         return (
             <View
                 style={{
+                    flex: 1,
+                    justifyContent: "center",
                     alignItems: "center",
-                    marginTop: 150,
                 }}
             >
+                <Animated.View style={trailStyle} />
+                <Animated.View
+                    style={{
+                        transform: [{ translateX: pan.x }],
+                    }}
+                    {...panResponder.panHandlers}
+                >
+                    <Text
+                        style={{
+                            fontSize: 70,
+                            fontFamily: "Roboto",
+                            fontWeight: "bold",
+                            color: "white",
+                            marginBottom: 40,
+                            letterSpacing: 13,
+                            backgroundColor: "rgba(255,255,255,0.2)",
+                            borderRadius: 10,
+                            padding: 5,
+                        }}
+                    >
+                        {currentYear}
+                    </Text>
+                </Animated.View>
+
                 <View>
                     <Text style={[styles.textDark, styles.bigText]}>
                         {months[decideMonthForArray(month)].fullName}
@@ -168,7 +242,7 @@ export default function App() {
                         renderItem={({ item }) => renderDays(item, currentYear)}
                         maxToRenderPerBatch={20} // tweak this value as needed
                         initialNumToRender={1} // tweak this value as needed
-                        scrollEnabled={true}
+                        scrollEnabled={false}
                         showDefaultLoadingIndicators={
                             monthsLoaded[monthsLoaded.length - 1] === 12
                         }
@@ -221,7 +295,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     backgroundDark: {
-        backgroundColor: "#22092C",
+        backgroundColor: "#4B5358",
     },
     textDark: {
         color: "white",

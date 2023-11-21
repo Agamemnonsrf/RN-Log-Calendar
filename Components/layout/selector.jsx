@@ -6,7 +6,6 @@ import Constants from 'expo-constants';
 const statusBarHeight = Constants.statusBarHeight || 0;
 
 const windowHeight = Dimensions.get("window").height - statusBarHeight;
-console.log(statusBarHeight, windowHeight)
 const monthBoxHeight = (windowHeight) / 12;
 
 const Selector = () => {

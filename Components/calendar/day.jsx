@@ -1,10 +1,11 @@
-import React, { memo } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { memo, useContext } from "react";
+import FlatListRefContext from "../context/flatListContext";
+import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 
 export const Day = ({ day, isCurrentMonth, month, isToday }) => {
-
+    const { currentYear, dropDownRef } = useContext(FlatListRefContext);
     return (
-        <View
+        <TouchableHighlight
             style={[
                 styles.container,
                 {
@@ -14,6 +15,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday }) => {
                     backgroundColor: isToday ? "#F05941" : "transparent",
                 },
             ]}
+            onPress={() => dropDownRef.current.showDropdown(currentYear, month, day)}
         >
             <Text
                 style={{
@@ -23,7 +25,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday }) => {
             >
                 {day}
             </Text>
-        </View>
+        </TouchableHighlight>
     );
 };
 

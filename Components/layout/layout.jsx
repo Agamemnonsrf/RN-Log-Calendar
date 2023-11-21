@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import {
     View,
     StyleSheet,
@@ -11,20 +11,17 @@ import {
 import { months } from "../data/data.js";
 import { MonthBox } from "./monthBox.jsx";
 import Selector from "./selector.jsx";
+import Dropdown from "../calendar/dropdown.jsx";
+import FlatListRefContext from "../context/flatListContext";
 
 const Layout = ({ children }) => {
+    const { dropDownRef } = useContext(FlatListRefContext);
     return (
         <View style={styles.container}>
+            <Dropdown ref={dropDownRef} />
             <View style={styles.sidebar}>
                 <View
-                    style={{
-                        flex: 5,
-                        width: "200%",
-                        height: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "row",
-                    }}
+                    style={styles.childrenContainer}
                 >
                     {children}
                 </View>
@@ -89,10 +86,15 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "space-around",
         alignItems: "center",
-
         position: "relative",
     },
-    childrenContainer: {},
+    childrenContainer: {
+        flex: 5,
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+    },
     text: {
         color: "white",
         margin: 5,

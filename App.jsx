@@ -1,181 +1,57 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useRef, useEffect } from "react";
-import {
-    StyleSheet,
-    Text,
-    View,
-    ScrollView,
-    Dimensions,
-    PanResponder,
-    Animated,
-} from "react-native";
+import { StyleSheet, Animated, View, Dimensions } from "react-native";
 import Layout from "./Components/layout/layout";
-import { months } from "./Components/data/data";
-import Day from "./Components/calendar/day";
-import { FlatList } from "react-native-bidirectional-infinite-scroll";
-import FlatListRefContext from "./Components/context/flatListContext";
-import Constants from 'expo-constants';
-import YearSelector from "./Components/calendar/yearSelector";
 
-const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height - Constants.statusBarHeight;
+import FlatListRefContext from "./Components/context/flatListContext";
+import CurrentMonth from "./Components/calendar/currentMonth";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-
-    const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
-
-    const getDayOffset = (month, year, day) => {
-        let dayOfWeek = new Date(year, month - 1, day).getDay() - 1;
-        return dayOfWeek === -1 ? 6 : dayOfWeek;
-    };
-
-    const getStartingDayOffset = (month, year) => getDayOffset(month, year, 1);
-
-    const getEndingDayOffset = (month, year) =>
-        getDayOffset(month, year, getDaysInMonth(month, year));
-
-    const decideMonth = (month, offset) => {
-        const adjustedMonth = month + offset;
-        if (adjustedMonth === 0) return 12;
-        if (adjustedMonth === 13) return 1;
-        return adjustedMonth;
-    };
-
-    const decideMonthForArray = (month) => {
-        const adjustedMonth = month;
-        if (adjustedMonth === 12) return 11;
-        if (adjustedMonth === -1) return 0;
-        return adjustedMonth - 1;
-    };
-
-    const renderDays = (month, year) => {
-        const daysInMonth = getDaysInMonth(month, year);
-        const startOffset = getStartingDayOffset(month, year);
-        const endOffset = getEndingDayOffset(month, year);
-
-        const days = [];
-
-        // Start month
-        for (let i = 0; i < startOffset; i++) {
-            const yearOffset = month === 1 ? 1 : 0;
-            const newmonth = new Date(year - yearOffset, month, 0);
-
-            days.push({
-                day: getDaysInMonth(newmonth.getMonth(), year) - i,
-                month: decideMonth(newmonth.getMonth() - 1, 1),
-                year: year,
-            });
-        }
-        days.reverse();
-
-        // Current month
-        for (let i = 1; i <= daysInMonth; i++) {
-            days.push({ day: i, month: month, year: year });
-        }
-
-        // End month
-        for (let i = 1; i <= endOffset; i++) {
-            const newmonth = new Date(year, month, 1);
-            days.push({
-                day: i,
-                month: decideMonth(newmonth.getMonth(), 1),
-                year: year,
-            });
-        }
-
-        const ITEM_HEIGHT = 64; // height of each item
-        const NUM_COLUMNS = 7;
-        const numRows = Math.ceil(days.length / NUM_COLUMNS);
-
-        // Calculate the total height of the FlatList
-        const totalHeight = numRows * ITEM_HEIGHT;
-
-        return (
-            <View
-                style={{
-
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: screenHeight
-                }}
-            >
-
-                <YearSelector setCurrentYear={setCurrentYear} currentYear={currentYear} />
-                {/* <Animated.View style={trailStyle} /> */}
-                <View>
-                    <Text style={[styles.textDark, styles.bigText]}>
-                        {months[decideMonthForArray(month)].fullName}
-                    </Text>
-                </View>
-                <FlatList
-                    renderItem={({ item }) => (
-                        <Day
-                            day={item.day}
-                            isCurrentMonth={item.month === month}
-                            month={item.month}
-                            isToday={
-                                item.day === new Date().getDate() &&
-                                item.month === new Date().getMonth() + 1 &&
-                                item.year === new Date().getFullYear()
-                            }
-                        />
-                    )}
-                    data={days}
-                    keyExtractor={(item, index) => index.toString()}
-                    numColumns={7}
-                    style={{
-                        flexGrow: 0,
-                    }}
-                    scrollEnabled={false}
-                    getItemLayout={(data, index) => ({
-                        length: totalHeight,
-                        offset: totalHeight * index,
-                        index,
-                    })}
-                // windowSize={21} // tweak this value as needed
-                // maxToRenderPerBatch={20} // tweak this value as needed
-                // initialNumToRender={14} // tweak this value as needed
-                />
-            </View>
-        );
-    };
+    const [showDropDown, setShowDropDown] = useState(false);
 
     const position1 = useRef(new Animated.Value(0)).current;
-
+    const dropDownRef = useRef();
 
     function selectNewMonth(newMonth) {
+        let newMonthCall;
+        setCurrentMonth(prev => {
+            newMonthCall = prev;
+            return prev;
+        });
+        if (newMonth === newMonthCall) return;
         Animated.timing(position1, {
             toValue: -screenWidth,
-            duration: 500,
+            duration: 400,
             useNativeDriver: false,
         }).start(() => {
-            setCurrentMonth(newMonth);
+            setCurrentMonth(newMonth)
         });
     }
 
     useEffect(() => {
         Animated.timing(position1, {
             toValue: 0,
-            duration: 500,
+            duration: 400,
             useNativeDriver: false,
         }).start();
-
     }, [currentMonth]);
 
-
     return (
-        <FlatListRefContext.Provider
-            value={{ selectNewMonth, currentMonth }}
-        >
+        <FlatListRefContext.Provider value={{ selectNewMonth, currentMonth, currentYear, dropDownRef }}>
             <View style={[styles.container, styles.backgroundDark]}>
-                <Layout
-                    currentMonth={currentMonth}
-                    setCurrentMonth={setCurrentMonth}
-                >
-                    <Animated.View style={{ transform: [{ translateX: position1 }] }}>
-                        {renderDays(currentMonth, currentYear)}
+                <Layout>
+                    <Animated.View
+                        style={{ transform: [{ translateX: position1 }], width: "100%" }}
+                    >
+                        <CurrentMonth
+                            currentMonth={currentMonth}
+                            setCurrentYear={setCurrentYear}
+                            currentYear={currentYear}
+                        />
                     </Animated.View>
                 </Layout>
                 <StatusBar style="light" translucent={false} />

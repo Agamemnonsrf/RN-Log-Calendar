@@ -12,15 +12,18 @@ import { months } from "../data/data.js";
 import { MonthBox } from "./monthBox.jsx";
 import Selector from "./selector.jsx";
 
-const Layout = ({ children, currentMonth, setCurrentMonth }) => {
+const Layout = ({ children }) => {
     return (
         <View style={styles.container}>
             <View style={styles.sidebar}>
                 <View
                     style={{
                         flex: 5,
-                        width: "100%",
+                        width: "200%",
                         height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "row",
                     }}
                 >
                     {children}
@@ -30,7 +33,6 @@ const Layout = ({ children, currentMonth, setCurrentMonth }) => {
                         <MonthBox
                             month={month}
                             key={month.id}
-                            setCurrentMonth={setCurrentMonth}
                         />
                     ))}
                     <Selector />

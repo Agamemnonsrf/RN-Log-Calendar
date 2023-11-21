@@ -2,14 +2,7 @@ import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 export const Day = ({ day, isCurrentMonth, month, isToday }) => {
-    // const isToday = () => {
-    //     const today = new Date();
-    //     return (
-    //         today.getDate() === day &&
-    //         today.getMonth() + 1 === month &&
-    //         today.getFullYear() === new Date().getFullYear()
-    //     );
-    // };
+
     return (
         <View
             style={[
@@ -25,6 +18,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday }) => {
             <Text
                 style={{
                     color: isCurrentMonth ? "white" : "rgba(255,255,255,0.8)",
+                    padding: 2
                 }}
             >
                 {day}
@@ -36,7 +30,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday }) => {
 const styles = StyleSheet.create({
     container: {
         width: 38,
-        height: 55,
+        height: 60,
         borderRadius: 4,
         borderWidth: 1,
         justifyContent: "flex-start",

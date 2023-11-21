@@ -7,11 +7,11 @@ import {
     TouchableHighlight,
 } from "react-native";
 
-export const MonthBox = ({ month, setCurrentMonth }) => {
+export const MonthBox = ({ month }) => {
+    const isTodayMonth = month.id === new Date().getMonth() + 1;
     return (
         <Pressable
-            style={[styles.container]}
-            onPressIn={() => setCurrentMonth(month.id)}
+            style={[styles.container, { backgroundColor: isTodayMonth ? "rgba(255,255,255,0.5)" : "transparent" }]}
             underlayColor="#DDDDDD"
         >
             <Text

@@ -14,54 +14,15 @@ import { months } from "./Components/data/data";
 import Day from "./Components/calendar/day";
 import { FlatList } from "react-native-bidirectional-infinite-scroll";
 import FlatListRefContext from "./Components/context/flatListContext";
+import Constants from 'expo-constants';
+import YearSelector from "./Components/calendar/yearSelector";
+
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height - Constants.statusBarHeight;
 
 export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const [monthsLoaded, setMonthsLoaded] = useState([1]);
-    const pan = useRef(new Animated.ValueXY()).current;
-    const panResponder = useRef(
-        PanResponder.create({
-            onMoveShouldSetPanResponder: () => true,
-            onPanResponderMove: Animated.event(
-                [null, { dx: pan.x, dy: pan.y }],
-                { useNativeDriver: false }
-            ),
-            onPanResponderRelease: () => {
-                if (pan.x._value > 150) {
-                    setCurrentYear((prevYear) => prevYear - 1);
-                } else if (pan.x._value < -150) {
-                    setCurrentYear((prevYear) => prevYear + 1);
-                }
-                Animated.spring(pan, {
-                    toValue: { x: 0, y: 0 },
-                    useNativeDriver: false,
-                }).start();
-            },
-        })
-    ).current;
-
-    const trailStyle = {
-        position: "absolute",
-        height: 50,
-        backgroundColor: "aliceblue",
-        left: pan.x.interpolate({
-            inputRange: [-1, 0, 1],
-            outputRange: ["0%", "0%", "100%"],
-            extrapolate: "clamp",
-        }),
-        right: pan.x.interpolate({
-            inputRange: [-1, 0, 1],
-            outputRange: ["100%", "0%", "0%"],
-            extrapolate: "clamp",
-        }),
-    };
-
-    useEffect(() => {
-        pan.setValue({ x: 0, y: 0 });
-    }, [currentYear]);
-
-    const flatListRef = useRef(null);
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -124,7 +85,7 @@ export default function App() {
             });
         }
 
-        const ITEM_HEIGHT = 59; // height of each item
+        const ITEM_HEIGHT = 64; // height of each item
         const NUM_COLUMNS = 7;
         const numRows = Math.ceil(days.length / NUM_COLUMNS);
 
@@ -134,35 +95,15 @@ export default function App() {
         return (
             <View
                 style={{
-                    flex: 1,
+
                     justifyContent: "center",
                     alignItems: "center",
+                    height: screenHeight
                 }}
             >
-                <Animated.View style={trailStyle} />
-                <Animated.View
-                    style={{
-                        transform: [{ translateX: pan.x }],
-                    }}
-                    {...panResponder.panHandlers}
-                >
-                    <Text
-                        style={{
-                            fontSize: 70,
-                            fontFamily: "Roboto",
-                            fontWeight: "bold",
-                            color: "white",
-                            marginBottom: 40,
-                            letterSpacing: 13,
-                            backgroundColor: "rgba(255,255,255,0.2)",
-                            borderRadius: 10,
-                            padding: 5,
-                        }}
-                    >
-                        {currentYear}
-                    </Text>
-                </Animated.View>
 
+                <YearSelector setCurrentYear={setCurrentYear} currentYear={currentYear} />
+                {/* <Animated.View style={trailStyle} /> */}
                 <View>
                     <Text style={[styles.textDark, styles.bigText]}>
                         {months[decideMonthForArray(month)].fullName}
@@ -193,92 +134,51 @@ export default function App() {
                         offset: totalHeight * index,
                         index,
                     })}
-                    windowSize={21} // tweak this value as needed
-                    maxToRenderPerBatch={20} // tweak this value as needed
-                    initialNumToRender={14} // tweak this value as needed
+                // windowSize={21} // tweak this value as needed
+                // maxToRenderPerBatch={20} // tweak this value as needed
+                // initialNumToRender={14} // tweak this value as needed
                 />
             </View>
         );
     };
 
-    const onStartReached = () => {
-        console.log("onStartReached");
-        // set the monthsLoaded everytime, but if months loaded is like over 5, cut off the last one too after adding the new one
-        setMonthsLoaded((prev) => {
-            const newMonths = [prev[0] - 1, ...prev];
-            if (newMonths.length > 5) {
-                newMonths.pop();
-            }
-            return newMonths;
-        });
-    };
+    const position1 = useRef(new Animated.Value(0)).current;
 
-    const onEndReached = () => {
-        console.log("onEndReached");
-        // set the monthsLoaded everytime, but if months loaded is like over 5, cut off the last one too after adding the new one
-        setMonthsLoaded((prev) => {
-            const newMonths = [...prev, prev[prev.length - 1] + 1];
-            if (newMonths.length > 5) {
-                newMonths.shift();
-            }
-            return newMonths;
+
+    function selectNewMonth(newMonth) {
+        Animated.timing(position1, {
+            toValue: -screenWidth,
+            duration: 500,
+            useNativeDriver: false,
+        }).start(() => {
+            setCurrentMonth(newMonth);
         });
-    };
+    }
+
+    useEffect(() => {
+        Animated.timing(position1, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: false,
+        }).start();
+
+    }, [currentMonth]);
+
 
     return (
         <FlatListRefContext.Provider
-            value={{ flatListRef, setMonthsLoaded, monthsLoaded }}
+            value={{ selectNewMonth, currentMonth }}
         >
             <View style={[styles.container, styles.backgroundDark]}>
                 <Layout
                     currentMonth={currentMonth}
                     setCurrentMonth={setCurrentMonth}
                 >
-                    <Text>{monthsLoaded[monthsLoaded.length - 1] === 12}</Text>
-                    <FlatList
-                        ref={flatListRef}
-                        data={monthsLoaded}
-                        keyExtractor={(item, index) => `${item}-${currentYear}`}
-                        renderItem={({ item }) => renderDays(item, currentYear)}
-                        maxToRenderPerBatch={20} // tweak this value as needed
-                        initialNumToRender={1} // tweak this value as needed
-                        scrollEnabled={false}
-                        showDefaultLoadingIndicators={
-                            monthsLoaded[monthsLoaded.length - 1] === 12
-                        }
-                        ListFooterComponent={() => {
-                            return (
-                                monthsLoaded[monthsLoaded.length - 1] ===
-                                    12 && (
-                                    <View
-                                        style={{
-                                            flex: 1,
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontSize: 50,
-                                                fontWeight: "bold",
-                                                color: "white",
-                                            }}
-                                        >
-                                            {currentYear + 1}
-                                        </Text>
-                                    </View>
-                                )
-                            );
-                        }}
-                        ListFooterComponentStyle={{
-                            height: 100,
-                            backgroundColor:
-                                monthsLoaded[monthsLoaded.length - 1] === 12
-                                    ? "rgba(255, 255, 255, 0.2)"
-                                    : "transparent",
-                        }}
-                    />
+                    <Animated.View style={{ transform: [{ translateX: position1 }] }}>
+                        {renderDays(currentMonth, currentYear)}
+                    </Animated.View>
                 </Layout>
+                <StatusBar style="light" translucent={false} />
             </View>
         </FlatListRefContext.Provider>
     );
@@ -295,7 +195,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     backgroundDark: {
-        backgroundColor: "#4B5358",
+        backgroundColor: "#2B303A",
     },
     textDark: {
         color: "white",

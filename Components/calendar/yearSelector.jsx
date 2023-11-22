@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Animated, PanResponder } from "react-native";
-
+import { AntDesign } from '@expo/vector-icons';
 
 export default YearSelector = ({ setCurrentYear, currentYear }) => {
     useEffect(() => {
@@ -52,19 +52,19 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
             }}
             {...panResponder.panHandlers}
         >
-            {/* <View style={{ justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white" }}>{currentYear - 1}</Text><Text style={{ color: "white" }}>{"<"}</Text></View> */}
+            <View style={{ justifyContent: "center", alignItems: "center" }}><AntDesign name="caretleft" size={20} color="rgba(255,255,255,0.6)" /></View>
             <Text
                 style={{
-                    fontSize: 70,
+                    fontSize: 60,
                     fontFamily: "sans-serif",
                     fontWeight: "bold",
                     color: "white",
-                    letterSpacing: 13,
+                    letterSpacing: 8,
                 }}
             >
                 {currentYear}
             </Text>
-            {/* <View style={{ justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white" }}>{currentYear + 1}</Text><Text style={{ color: "white" }}>{">"}</Text></View> */}
+            <View style={{ justifyContent: "center", alignItems: "center" }}><AntDesign name="caretright" size={20} color="rgba(255,255,255,0.6)" /></View>
         </Animated.View>
     )
 }

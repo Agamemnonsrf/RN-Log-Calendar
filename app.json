@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "RN-Log-Calendar",
+    "name": "Log Calendar",
     "slug": "RN-Log-Calendar",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-new.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-new.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2B303A"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,12 +19,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/adaptive-icon-new.png",
+        "backgroundColor": "#2B303A"
+      },
+      "package": "com.RNLogCalendar.RNLogCalendar"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6138a021-c6c9-4653-a2c3-7c716ce63dc1"
+      }
     }
   }
 }

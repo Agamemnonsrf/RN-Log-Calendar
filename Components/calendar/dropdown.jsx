@@ -242,7 +242,7 @@ export default Dropdown = forwardRef((_, ref) => {
             } catch (e) {
                 console.log(e);
             }
-        }, 1000)
+        }, 500)
     ).current;
 
     const handleTextChange = (text) => {

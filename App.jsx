@@ -1,21 +1,33 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { StyleSheet, Animated, View, Dimensions } from "react-native";
 import Layout from "./Components/layout/layout";
 
 import FlatListRefContext from "./Components/context/flatListContext";
 import CurrentMonth from "./Components/calendar/currentMonth";
+import { useFonts } from 'expo-font';
+
+
 
 const screenWidth = Dimensions.get("window").width;
+
 
 export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const [showDropDown, setShowDropDown] = useState(false);
 
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
     const dayRef = useRef();
+    const [fontsLoaded] = useFonts({
+        'Poppins': require('./assets/fonts/Poppins/Poppins-Regular.ttf'),
+    });
+
+
+
+
+
+
 
     function selectNewMonth(newMonth) {
         let newMonthCall;

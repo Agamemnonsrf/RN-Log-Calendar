@@ -137,6 +137,7 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
 const styles = StyleSheet.create({
     textDark: {
         color: "white",
+        fontFamily: "Roboto"
     },
     bigText: {
         fontSize: 34,

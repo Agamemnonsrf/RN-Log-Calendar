@@ -15,6 +15,7 @@ export default function App() {
 
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
+    const dayRef = useRef();
 
     function selectNewMonth(newMonth) {
         let newMonthCall;
@@ -22,6 +23,7 @@ export default function App() {
             newMonthCall = prev;
             return prev;
         });
+
         if (newMonth === newMonthCall) return;
         Animated.timing(position1, {
             toValue: -screenWidth,
@@ -41,7 +43,7 @@ export default function App() {
     }, [currentMonth]);
 
     return (
-        <FlatListRefContext.Provider value={{ selectNewMonth, currentMonth, currentYear, dropDownRef }}>
+        <FlatListRefContext.Provider value={{ selectNewMonth, setCurrentMonth, currentMonth, currentYear, dropDownRef, dayRef }}>
             <View style={[styles.container, styles.backgroundDark]}>
                 <Layout>
                     <Animated.View

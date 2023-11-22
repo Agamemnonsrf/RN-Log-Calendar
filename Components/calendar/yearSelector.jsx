@@ -7,6 +7,7 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
         pan.setValue({ x: 0, y: 0 });
     }, [currentYear]);
 
+
     const pan = useRef(new Animated.ValueXY()).current;
 
     const panResponder = useRef(

@@ -12,11 +12,8 @@ const Selector = () => {
     const { currentMonth, selectNewMonth } =
         useContext(FlatListRefContext);
 
-
     const topPosition = useRef(new Animated.ValueXY({ y: (currentMonth - 1) * monthBoxHeight, x: 0 })).current;
     const scale = useRef(new Animated.Value(1)).current;
-
-
 
     let initialTop = 0;
 

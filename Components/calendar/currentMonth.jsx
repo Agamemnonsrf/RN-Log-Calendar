@@ -1,14 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useContext } from "react";
 import { View, Text, Animated, FlatList, Dimensions, StyleSheet } from "react-native";
 import { months } from "../data/data";
 import Day from "./day";
 import YearSelector from "./yearSelector";
 import Constants from 'expo-constants';
+import FlatListRefContext from "../context/flatListContext";
+
 const screenHeight = Dimensions.get('window').height - Constants.statusBarHeight;
 
 const oneLetterDays = ["M", "T", "W", "T", "F", "S", "S"];
 
 export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
+    const { dayRef } = useContext(FlatListRefContext);
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -36,9 +39,6 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
         return adjustedMonth - 1;
     };
 
-
-
-
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
     const startOffset = getStartingDayOffset(currentMonth, currentYear);
     const endOffset = getEndingDayOffset(currentMonth, currentYear);
@@ -49,11 +49,10 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
     for (let i = 0; i < startOffset; i++) {
         const yearOffset = currentMonth === 1 ? 1 : 0;
         const newmonth = new Date(currentYear - yearOffset, currentMonth, 0);
-
         days.push({
-            day: getDaysInMonth(newmonth.getMonth(), currentYear) - i,
+            day: getDaysInMonth(newmonth.getMonth(), newmonth.getFullYear()) - i,
             month: decideMonth(newmonth.getMonth() - 1, 1),
-            year: currentYear,
+            year: newmonth.getFullYear(),
         });
     }
     days.reverse();
@@ -69,7 +68,7 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
         days.push({
             day: i,
             month: decideMonth(newmonth.getMonth(), 1),
-            year: currentYear,
+            year: newmonth.getFullYear(),
         });
     }
 
@@ -106,15 +105,17 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
                         day={item.day}
                         isCurrentMonth={item.month === currentMonth}
                         month={item.month}
+                        year={item.year}
                         isToday={
                             item.day === new Date().getDate() &&
                             item.month === new Date().getMonth() + 1 &&
                             item.year === new Date().getFullYear()
                         }
+
                     />
                 )}
                 data={days}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => new Date(item.year, item.month + 1, item.day).toDateString() + index.toString()}
                 numColumns={7}
                 style={{
                     flexGrow: 0,
@@ -129,7 +130,7 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
             // maxToRenderPerBatch={20} // tweak this value as needed
             // initialNumToRender={14} // tweak this value as needed
             />
-        </View >
+        </View>
     );
 }
 

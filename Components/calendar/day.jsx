@@ -1,9 +1,12 @@
-import React, { forwardRef, memo, useContext, useEffect, useImperativeHandle, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import FlatListRefContext from "../context/flatListContext";
-import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
+import { Dimensions, View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+const windowWidth = Dimensions.get('window').width;
+const childrenWidth = windowWidth * 0.83;
 
 export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
     const { dropDownRef } = useContext(FlatListRefContext);

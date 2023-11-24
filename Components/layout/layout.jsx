@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     selector: {
         flex: 1,
         height: "8.33%",
-
         position: "absolute",
         zIndex: 3,
         width: "100%",

@@ -85,6 +85,7 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
                 justifyContent: "center",
                 alignItems: "center",
                 height: screenHeight,
+                width: "100%"
             }}
         >
 
@@ -111,6 +112,11 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
                             item.month === new Date().getMonth() + 1 &&
                             item.year === new Date().getFullYear()
                         }
+                        style={{
+                            width: "100%",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}
 
                     />
                 )}

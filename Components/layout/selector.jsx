@@ -1,21 +1,34 @@
 import React, { useRef, useContext, useEffect, useState } from "react";
 import { Animated, PanResponder, Dimensions, StyleSheet } from "react-native";
 import FlatListRefContext from "../context/flatListContext";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 const statusBarHeight = Constants.statusBarHeight || 0;
 
 const windowHeight = Dimensions.get("window").height - statusBarHeight;
-const monthBoxHeight = (windowHeight) / 12;
+const monthBoxHeight = windowHeight / 12;
+
+let gotoMonth;
 
 const Selector = () => {
-    const { currentMonth, selectNewMonth } =
-        useContext(FlatListRefContext);
+    const { currentMonth, selectNewMonth } = useContext(FlatListRefContext);
 
-    const topPosition = useRef(new Animated.ValueXY({ y: (currentMonth - 1) * monthBoxHeight, x: 0 })).current;
+    const topPosition = useRef(
+        new Animated.ValueXY({ y: (currentMonth - 1) * monthBoxHeight, x: 0 })
+    ).current;
     const scale = useRef(new Animated.Value(1)).current;
 
     let initialTop = 0;
+
+    const goToMonth = (month) => {
+        Animated.timing(topPosition, {
+            toValue: { x: 0, y: (month - 1) * monthBoxHeight },
+            useNativeDriver: false,
+            duration: 200,
+        }).start();
+    };
+
+    gotoMonth = goToMonth;
 
     const panResponder = useRef(
         PanResponder.create({
@@ -44,11 +57,13 @@ const Selector = () => {
                     duration: 200,
                     useNativeDriver: false,
                 }).start();
-                const newIndex = Math.round(topPosition.y._value / monthBoxHeight);
+                const newIndex = Math.round(
+                    topPosition.y._value / monthBoxHeight
+                );
                 Animated.timing(topPosition, {
                     toValue: { x: 0, y: newIndex * monthBoxHeight },
                     useNativeDriver: false,
-                    duration: 200
+                    duration: 200,
                 }).start();
                 selectNewMonth(newIndex + 1);
             },
@@ -75,8 +90,7 @@ const styles = StyleSheet.create({
         zIndex: 3,
         width: "100%",
         backgroundColor: "rgba(255, 255, 255, 0.2)",
-
     },
 });
 
-export default Selector;
+export { Selector, gotoMonth };

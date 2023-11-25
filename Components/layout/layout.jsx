@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { months } from "../data/data.js";
 import { MonthBox } from "./monthBox.jsx";
-import Selector from "./selector.jsx";
+import { Selector } from "./selector.jsx";
 import Dropdown from "../calendar/dropdown.jsx";
 import FlatListRefContext from "../context/flatListContext";
 
@@ -20,17 +20,10 @@ const Layout = ({ children }) => {
         <View style={styles.container}>
             <Dropdown ref={dropDownRef} />
             <View style={styles.sidebar}>
-                <View
-                    style={styles.childrenContainer}
-                >
-                    {children}
-                </View>
+                <View style={styles.childrenContainer}>{children}</View>
                 <View style={styles.monthsContainer}>
                     {months.map((month) => (
-                        <MonthBox
-                            month={month}
-                            key={month.id}
-                        />
+                        <MonthBox month={month} key={month.id} />
                     ))}
                     <Selector />
                 </View>
@@ -83,7 +76,6 @@ const styles = StyleSheet.create({
     monthsContainer: {
         flex: 1,
         flexDirection: "column",
-        justifyContent: "space-around",
         alignItems: "center",
         position: "relative",
     },

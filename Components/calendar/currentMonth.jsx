@@ -1,16 +1,28 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { View, Text, Animated, FlatList, Dimensions, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    Animated,
+    FlatList,
+    Dimensions,
+    StyleSheet,
+} from "react-native";
 import { months } from "../data/data";
 import Day from "./day";
 import YearSelector from "./yearSelector";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
 
-const screenHeight = Dimensions.get('window').height - Constants.statusBarHeight;
+const screenHeight =
+    Dimensions.get("window").height - Constants.statusBarHeight;
 
 const oneLetterDays = ["M", "T", "W", "T", "F", "S", "S"];
 
-export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
+export default CurrentMonth = ({
+    currentMonth,
+    setCurrentYear,
+    currentYear,
+}) => {
     const { dayRef } = useContext(FlatListRefContext);
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
@@ -50,7 +62,8 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
         const yearOffset = currentMonth === 1 ? 1 : 0;
         const newmonth = new Date(currentYear - yearOffset, currentMonth, 0);
         days.push({
-            day: getDaysInMonth(newmonth.getMonth(), newmonth.getFullYear()) - i,
+            day:
+                getDaysInMonth(newmonth.getMonth(), newmonth.getFullYear()) - i,
             month: decideMonth(newmonth.getMonth() - 1, 1),
             year: newmonth.getFullYear(),
         });
@@ -85,13 +98,15 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
                 justifyContent: "center",
                 alignItems: "center",
                 height: screenHeight,
-                width: "100%"
+                width: "100%",
             }}
         >
-
-            <YearSelector setCurrentYear={setCurrentYear} currentYear={currentYear} />
+            <YearSelector
+                setCurrentYear={setCurrentYear}
+                currentYear={currentYear}
+            />
             {/* <Animated.View style={trailStyle} /> */}
-            <View>
+            <View style={{ height: "10%" }}>
                 <Text style={[styles.textDark, styles.bigText]}>
                     {months[decideMonthForArray(currentMonth)].fullName}
                 </Text>
@@ -99,7 +114,27 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
 
             <FlatList
                 ListHeaderComponent={() => {
-                    return <View style={{ flexDirection: "row", justifyContent: "space-around" }}>{oneLetterDays.map((item, index) => (<Text key={index} style={[styles.textDark, { marginHorizontal: 15 }]}>{item}</Text>))}</View>
+                    return (
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                justifyContent: "space-around",
+                                flex: 1,
+                            }}
+                        >
+                            {oneLetterDays.map((item, index) => (
+                                <Text
+                                    key={index}
+                                    style={[
+                                        styles.textDark,
+                                        { marginHorizontal: 15 },
+                                    ]}
+                                >
+                                    {item}
+                                </Text>
+                            ))}
+                        </View>
+                    );
                 }}
                 renderItem={({ item }) => (
                     <Day
@@ -115,40 +150,42 @@ export default CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) =>
                         style={{
                             width: "100%",
                             justifyContent: "center",
-                            alignItems: "center"
+                            alignItems: "center",
                         }}
-
                     />
                 )}
                 data={days}
-                keyExtractor={(item, index) => new Date(item.year, item.month + 1, item.day).toDateString() + index.toString()}
+                keyExtractor={(item, index) =>
+                    new Date(
+                        item.year,
+                        item.month + 1,
+                        item.day
+                    ).toDateString() + index.toString()
+                }
                 numColumns={7}
-                style={{
-                    flexGrow: 0,
-                }}
+                style={{ flexGrow: 0 }}
                 scrollEnabled={false}
                 getItemLayout={(data, index) => ({
                     length: totalHeight,
                     offset: totalHeight * index,
                     index,
                 })}
-            // windowSize={21} // tweak this value as needed
-            // maxToRenderPerBatch={20} // tweak this value as needed
-            // initialNumToRender={14} // tweak this value as needed
+                // windowSize={21} // tweak this value as needed
+                // maxToRenderPerBatch={20} // tweak this value as needed
+                // initialNumToRender={14} // tweak this value as needed
             />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     textDark: {
         color: "white",
-        fontFamily: "Roboto"
+        fontFamily: "Roboto",
     },
     bigText: {
         fontSize: 34,
         marginBottom: 10,
         fontWeight: "bold",
-
     },
-})
+});

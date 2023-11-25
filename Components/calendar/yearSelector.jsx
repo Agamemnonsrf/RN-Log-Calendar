@@ -1,70 +1,117 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, Animated, PanResponder } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
+import React, { useRef, useEffect, useState, useContext } from "react";
+import {
+    View,
+    Text,
+    Animated,
+    PanResponder,
+    Dimensions,
+    Pressable,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import Constants from "expo-constants";
+import FlatListRefContext from "../context/flatListContext";
+
+const windowWidth = Dimensions.get("window").width;
+const childrenWidth = windowWidth * 0.83;
+const windowHeight =
+    Dimensions.get("window").height - Constants.statusBarHeight;
 
 export default YearSelector = ({ setCurrentYear, currentYear }) => {
-    useEffect(() => {
-        pan.setValue({ x: 0, y: 0 });
-    }, [currentYear]);
+    const [selectedYear, setSelectedYear] = useState(currentYear);
 
+    const textScale = useRef(new Animated.Value(1)).current;
+    const { selectNewYear } = useContext(FlatListRefContext);
+    const AnimatedText = Animated.createAnimatedComponent(Text);
 
-    const pan = useRef(new Animated.ValueXY()).current;
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
 
-    const panResponder = useRef(
-        PanResponder.create({
-            onMoveShouldSetPanResponder: () => true,
-            onPanResponderGrant: () => {
-                pan.setOffset({
-                    x: pan.x._value,
-                    y: pan.y._value,
-                });
-            },
-
-            onPanResponderMove: Animated.event(
-                [null, { dx: pan.x, dy: pan.y }],
-                { useNativeDriver: false }
-            ),
-            onPanResponderRelease: () => {
-                Animated.spring(pan, {
-                    toValue: { x: 0, y: 0 },
-                    useNativeDriver: false,
-                    duration: 1000,
-                }).start();
-                if (pan.x._value > 150) {
-                    setCurrentYear((prevYear) => prevYear + 1);
-                } else if (pan.x._value < -150) {
-                    setCurrentYear((prevYear) => prevYear - 1);
-                }
-            },
-        })
+    const debounceSelectYear = useRef(
+        debounce((yearSelected) => {
+            selectNewYear(yearSelected);
+        }, 1000)
     ).current;
 
+    const handlePress = (direction) => {
+        setSelectedYear((prevYear) => {
+            debounceSelectYear(prevYear + direction);
+            return prevYear + direction;
+        });
+    };
+
+    useEffect(() => {
+        Animated.sequence([
+            Animated.timing(textScale, {
+                toValue: 1.1,
+                duration: 0,
+                useNativeDriver: true,
+            }),
+            Animated.timing(textScale, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [selectedYear]);
 
     return (
         <Animated.View
             style={{
-                transform: [{ translateX: pan.x }], justifyContent: "center",
-                alignItems: "center", flexDirection: "row", marginBottom: 40,
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                marginBottom: 10,
                 backgroundColor: "rgba(255,255,255,0.2)",
                 borderRadius: 10,
                 padding: 5,
-                height: 100,
+                height: windowHeight / 7,
             }}
-            {...panResponder.panHandlers}
         >
-            <View style={{ justifyContent: "center", alignItems: "center" }}><AntDesign name="caretleft" size={20} color="rgba(255,255,255,0.6)" /></View>
-            <Text
+            <Pressable
+                onPress={() => handlePress(-1)}
                 style={{
-                    fontSize: 60,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 5,
+                }}
+            >
+                <AntDesign
+                    name="caretleft"
+                    size={20}
+                    color="rgba(255,255,255,0.6)"
+                />
+            </Pressable>
+            <AnimatedText
+                style={{
+                    fontSize: (windowHeight / 7) * 0.6,
                     fontFamily: "sans-serif",
                     fontWeight: "bold",
                     color: "white",
                     letterSpacing: 8,
+                    transform: [{ scale: textScale }],
                 }}
             >
-                {currentYear}
-            </Text>
-            <View style={{ justifyContent: "center", alignItems: "center" }}><AntDesign name="caretright" size={20} color="rgba(255,255,255,0.6)" /></View>
+                {selectedYear}
+            </AnimatedText>
+            <Pressable
+                onPress={() => handlePress(+1)}
+                style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 5,
+                }}
+            >
+                <AntDesign
+                    name="caretright"
+                    size={20}
+                    color="rgba(255,255,255,0.6)"
+                />
+            </Pressable>
         </Animated.View>
-    )
-}
+    );
+};

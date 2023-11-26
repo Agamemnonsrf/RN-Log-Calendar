@@ -1,5 +1,7 @@
 const colorThemes = {
     defaultLight: {
+        name: "defaultLight",
+        overall: "light",
         background: "#F5F8FA",
         primary: "#3498db",
         primaryLowFade: "rgba(52,152,219,0.9)",
@@ -9,9 +11,10 @@ const colorThemes = {
         secondary: "#2ecc71",
         tertiary: "#e74c3c",
         quaternary: "#f39c12",
-        overall: "light",
     },
     autumnLight: {
+        name: "autumnLight",
+        overall: "light",
         background: "#FDF5E6",
         primary: "#8B4513",
         primaryLowFade: "rgba(139,69,19,0.9)",
@@ -21,9 +24,10 @@ const colorThemes = {
         secondary: "#FFD700",
         tertiary: "#32CD32",
         quaternary: "#FF4500",
-        overall: "light",
     },
     lavenderDream: {
+        name: "lavenderDream",
+        overall: "light",
         background: "#E6E6FA",
         primary: "#9370DB",
         primaryLowFade: "rgba(147,112,219,0.9)",
@@ -33,9 +37,10 @@ const colorThemes = {
         secondary: "#7B68EE",
         tertiary: "#9932CC",
         quaternary: "#BA55D3",
-        overall: "light",
     },
     defaultDark: {
+        name: "defaultDark",
+        overall: "dark",
         background: "#2B303A",
         primary: "white",
         primaryLowFade: "rgba(255,255,255,0.9)",
@@ -46,9 +51,10 @@ const colorThemes = {
         tertiary: "#62666e",
         quaternary: "#3D4452",
         quinary: "#2c3e5066",
-        overall: "dark",
     },
     enhancedDark: {
+        name: "enhancedDark",
+        overall: "dark",
         background: "#1E1E1E",
         primary: "#61dafb",
         primaryLowFade: "rgba(97,218,251,0.9)",
@@ -59,9 +65,10 @@ const colorThemes = {
         tertiary: "#c71585",
         quaternary: "#00fa9a",
         quinary: "#2c3e5066",
-        overall: "dark",
     },
     midnightBlue: {
+        name: "midnightBlue",
+        overall: "dark",
         background: "#191970",
         primary: "#00ced1",
         primaryLowFade: "rgba(0,206,209,0.9)",
@@ -71,9 +78,10 @@ const colorThemes = {
         secondary: "#4169e1",
         tertiary: "#9932cc",
         quaternary: "#8a2be2",
-        overall: "dark",
     },
     charcoalGray: {
+        name: "charcoalGray",
+        overall: "dark",
         background: "#2F4F4F",
         primary: "#dcdcdc",
         primaryLowFade: "rgba(220,220,220,0.9)",
@@ -83,7 +91,6 @@ const colorThemes = {
         secondary: "#778899",
         tertiary: "#696969",
         quaternary: "#808080",
-        overall: "dark",
     },
 
     // Add more color themes here

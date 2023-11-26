@@ -12,10 +12,12 @@ import {
     Dimensions,
     Animated,
     TouchableOpacity,
+    FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
+import colorThemes from "../data/themes";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight =
@@ -179,7 +181,9 @@ const SubMenu = ({ subMenuSection, subMenuHeight }) => {
                 { height: subMenuHeight, backgroundColor: theme.quaternary },
             ]}
         >
-            {decideSubMenu(subMenuSection)}
+            <View style={styles.subMenuContainer}>
+                {decideSubMenu(subMenuSection)}
+            </View>
         </Animated.View>
     );
 };
@@ -200,35 +204,91 @@ const decideSubMenu = (subMenuSection) => {
 };
 
 const ThemeSubMenu = () => {
+    const { theme, setTheme } = useContext(FlatListRefContext);
+
+    const changeTheme = (theme) => {
+        setTheme(theme);
+    };
+
+    const themesArray = Array.from(Object.values(colorThemes));
+
     return (
-        <View style={styles.subMenuContainer}>
-            <Text style={styles.subMenuText}>Themes</Text>
+        <View style={{ width: "100%", height: "100%" }}>
+            <FlatList
+                data={themesArray}
+                renderItem={({ item }) => {
+                    const colorArray = Array.from(Object.values(item)).splice(
+                        3
+                    );
+
+                    return (
+                        <TouchableOpacity
+                            style={{
+                                width: "90%",
+                                paddingVertical: 10,
+                                height: 100,
+                                margin: 15,
+                                backgroundColor: item.background,
+                                borderRadius: 10,
+                                justifyContent: "space-around",
+                                alignItems: "flex-start",
+                                shadowColor: item.background,
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 2,
+                                },
+                                shadowOpacity: 0.75,
+                                shadowRadius: 3.84,
+                                elevation: 5,
+                            }}
+                            onPress={() => setTheme(colorThemes[item.name])}
+                        >
+                            <Text
+                                style={[
+                                    styles.subMenuText,
+                                    { color: item.primary },
+                                ]}
+                            >
+                                {item.name}
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    width: "100%",
+                                    justifyContent: "space-evenly",
+                                }}
+                            >
+                                {colorArray.map((color) => {
+                                    return (
+                                        <View
+                                            style={{
+                                                width: 25,
+                                                height: 25,
+                                                backgroundColor: color,
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </View>
+                        </TouchableOpacity>
+                    );
+                }}
+                keyExtractor={(item) => item.name}
+            />
         </View>
     );
 };
 
 const ExportSubMenu = () => {
-    return (
-        <View style={styles.subMenuContainer}>
-            <Text style={styles.subMenuText}>Export</Text>
-        </View>
-    );
+    return <Text style={styles.subMenuText}>Export</Text>;
 };
 
 const ImportSubMenu = () => {
-    return (
-        <View style={styles.subMenuContainer}>
-            <Text style={styles.subMenuText}>Import</Text>
-        </View>
-    );
+    return <Text style={styles.subMenuText}>Import</Text>;
 };
 
 const SettingsSubMenu = () => {
-    return (
-        <View style={styles.subMenuContainer}>
-            <Text style={styles.subMenuText}>Settings</Text>
-        </View>
-    );
+    return <Text style={styles.subMenuText}>Settings</Text>;
 };
 
 const MenuItem = (props) => {
@@ -300,8 +360,9 @@ const styles = {
         alignItems: "center",
     },
     subMenuText: {
-        fontSize: 20,
-        color: "white",
+        fontSize: 16,
+        marginLeft: 15,
+        marginBottom: 15,
     },
 };
 

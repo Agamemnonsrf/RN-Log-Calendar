@@ -74,6 +74,7 @@ export default function App() {
                 sideMenuRef,
                 dayRef,
                 theme,
+                setTheme,
             }}
         >
             <View

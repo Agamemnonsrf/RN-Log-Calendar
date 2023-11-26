@@ -66,7 +66,7 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 marginBottom: 10,
-                backgroundColor: "rgba(255,255,255,0.2)",
+                backgroundColor: "rgba(41, 128, 185, 0.4)",
                 borderRadius: 10,
                 padding: 5,
                 height: windowHeight / 7,

@@ -5,7 +5,8 @@ import Layout from "./Components/layout/layout";
 
 import FlatListRefContext from "./Components/context/flatListContext";
 import CurrentMonth from "./Components/calendar/currentMonth";
-import { useFonts } from "expo-font";
+import BarsMenuIcon from "./Components/layout/BarsMenuIcon";
+import Constants from "expo-constants";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -15,6 +16,7 @@ export default function App() {
 
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
+    const sideMenuRef = useRef();
     const dayRef = useRef();
 
     const selectNewMonth = (newMonth) => {
@@ -68,6 +70,7 @@ export default function App() {
                 currentMonth,
                 currentYear,
                 dropDownRef,
+                sideMenuRef,
                 dayRef,
             }}
         >
@@ -79,6 +82,15 @@ export default function App() {
                             width: "100%",
                         }}
                     >
+                        <View
+                            style={{
+                                position: "absolute",
+                                top: 5,
+                                right: 0,
+                            }}
+                        >
+                            <BarsMenuIcon />
+                        </View>
                         <CurrentMonth
                             currentMonth={currentMonth}
                             setCurrentYear={setCurrentYear}

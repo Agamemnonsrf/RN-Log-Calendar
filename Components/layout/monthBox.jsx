@@ -36,6 +36,7 @@ export const MonthBox = ({ month }) => {
                     color: "white",
                     fontSize: 18,
                     backgroundColor: "transparent",
+                    fontWeight: "bold",
                 }}
             >
                 {month.name}

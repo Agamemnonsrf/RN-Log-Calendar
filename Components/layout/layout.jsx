@@ -13,11 +13,15 @@ import { MonthBox } from "./monthBox.jsx";
 import { Selector } from "./selector.jsx";
 import Dropdown from "../calendar/dropdown.jsx";
 import FlatListRefContext from "../context/flatListContext";
+import SideMenu from "./SideMenu.jsx";
 
 const Layout = ({ children }) => {
     const { dropDownRef } = useContext(FlatListRefContext);
+    const { sideMenuRef } = useContext(FlatListRefContext);
+
     return (
         <View style={styles.container}>
+            <SideMenu ref={sideMenuRef} />
             <Dropdown ref={dropDownRef} />
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
@@ -37,6 +41,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         width: "100%",
+        height: "100%",
     },
     selector: {
         flex: 1,

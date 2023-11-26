@@ -345,15 +345,12 @@ export default Dropdown = forwardRef((_, ref) => {
                     maxLength={2000}
                     onChangeText={(text) => handleTextChange(text)}
                     value={text}
-                    style={{
-                        padding: 10,
-                        backgroundColor: "#62666e",
-                        borderRadius: 5,
-                        textAlignVertical: "top",
-                        color: "white",
-                        fontSize: 18,
-                        height: textInputHeight,
-                    }}
+                    style={[
+                        styles.textInput,
+                        {
+                            height: textInputHeight,
+                        },
+                    ]}
                     placeholder="Your notes here..."
                     placeholderTextColor="rgba(255,255,255,0.5)"
                 />
@@ -381,11 +378,19 @@ const styles = StyleSheet.create({
         padding: 10,
         position: "absolute",
         top: 0,
-        backgroundColor: "rgba(255,255,255,0.2)",
+        backgroundColor: "rgba(41, 128, 185, 0.4)",
         borderRadius: 10,
         padding: 5,
         marginTop: 10,
         marginLeft: 10,
+    },
+    textInput: {
+        padding: 10,
+        backgroundColor: "#62666e",
+        borderRadius: 5,
+        textAlignVertical: "top",
+        color: "white",
+        fontSize: 18,
     },
     inputContainer: {
         padding: 10,

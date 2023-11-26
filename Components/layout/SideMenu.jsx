@@ -4,90 +4,87 @@ import React, {
     useRef,
     useImperativeHandle,
     useEffect,
+    useContext,
 } from "react";
 import {
     View,
-    Pressable,
     Text,
     Dimensions,
     Animated,
-    BackHandler,
     TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Constants } from "expo";
+import Constants from "expo-constants";
+import FlatListRefContext from "../context/flatListContext";
 
 const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
+const screenHeight =
+    Dimensions.get("window").height - Constants.statusBarHeight;
 
 const SideMenu = forwardRef((props, ref) => {
     const [isMenuOpen, setMenuOpen] = useState(false);
-    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
     const menuWidth = useRef(new Animated.Value(0)).current;
-    const subContainerWidth = useRef(new Animated.Value(0)).current;
-    const initialSubContainerWidth = screenWidth;
+    const subMenuHeight = useRef(new Animated.Value(0)).current;
+    const [subMenuSection, setSubMenuSection] = useState(0);
+
+    const { theme } = useContext(FlatListRefContext);
 
     const showMenu = () => {
-        Animated.parallel([
-            Animated.timing(menuWidth, {
-                toValue: screenWidth,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-            Animated.timing(subContainerWidth, {
-                toValue: initialSubContainerWidth,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-        ]).start(() => {
+        Animated.timing(menuWidth, {
+            toValue: screenWidth,
+            duration: 300,
+            useNativeDriver: false,
+        }).start(() => {
             setMenuOpen(true);
         });
     };
 
     const hideMenu = () => {
-        Animated.parallel([
-            Animated.timing(menuWidth, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-            Animated.timing(subContainerWidth, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-        ]).start(() => {
-            setMenuOpen(false);
+        setMenuOpen(false);
+    };
+
+    const showSubMenu = (section) => {
+        if (section === subMenuSection) return;
+        Animated.timing(subMenuHeight, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+        }).start(() => {
+            setSubMenuSection(section);
         });
     };
+
+    useEffect(() => {
+        Animated.timing(subMenuHeight, {
+            toValue: screenHeight - (screenHeight / 11) * 5,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }, [subMenuSection]);
+
+    useEffect(() => {
+        if (!isMenuOpen) {
+            Animated.parallel([
+                Animated.timing(menuWidth, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: false,
+                }),
+            ]).start();
+        }
+    }, [isMenuOpen]);
 
     useImperativeHandle(ref, () => ({
         showMenu,
     }));
 
-    useEffect(() => {
-        console.log("add back handler sidemenu");
-        const backAction = () => {
-            console.log("back action");
-
-            hideMenu();
-            return true;
-        };
-
-        const backHandlerMenu = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
-        return () => {
-            console.log("remove back handler");
-            backHandlerMenu.remove();
-        };
-    }, []);
-
     return (
         <View style={styles.container}>
             <Animated.View
-                style={[styles.subContainer, { width: menuWidth }]}
+                style={[
+                    styles.subContainer,
+                    { width: menuWidth, backgroundColor: theme.background },
+                ]}
                 onStartShouldSetResponder={() => true}
             >
                 <View>
@@ -96,7 +93,7 @@ const SideMenu = forwardRef((props, ref) => {
                             styles.menuItem,
                             {
                                 width: "100%",
-                                backgroundColor: "rgba(41, 128, 185, 0.4)",
+                                backgroundColor: theme.secondary,
                                 justifyContent: "flex-end",
                             },
                         ]}
@@ -105,43 +102,138 @@ const SideMenu = forwardRef((props, ref) => {
                         <Ionicons
                             name="close-outline"
                             size={30}
-                            color="white"
+                            color={theme.primary}
                             style={{ marginRight: 10 }}
                         />
                     </TouchableOpacity>
                 </View>
                 <View>
                     <TouchableOpacity
-                        style={styles.menuItem}
-                        onPress={() => props.showChildMenu()}
+                        style={[
+                            styles.menuItem,
+                            { backgroundColor: theme.primaryVeryHighFade },
+                        ]}
+                        onPress={() => showSubMenu(0)}
                     >
                         <MenuItem
                             icon={"color-palette-outline"}
                             text="Themes"
+                            isMenuOpen={isMenuOpen}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity
+                        style={[
+                            styles.menuItem,
+                            { backgroundColor: theme.primaryVeryHighFade },
+                        ]}
+                        onPress={() => showSubMenu(1)}
+                    >
                         <MenuItem
                             icon={"cloud-upload-outline"}
                             text="Export Notes"
+                            isMenuOpen={isMenuOpen}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
+                    <TouchableOpacity
+                        style={[
+                            styles.menuItem,
+                            { backgroundColor: theme.primaryVeryHighFade },
+                        ]}
+                        onPress={() => showSubMenu(2)}
+                    >
                         <MenuItem
                             icon={"cloud-download-outline"}
                             text="Import Notes"
+                            isMenuOpen={isMenuOpen}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <MenuItem icon={"settings-outline"} text="Settings" />
+                    <TouchableOpacity
+                        style={[
+                            styles.menuItem,
+                            { backgroundColor: theme.primaryVeryHighFade },
+                        ]}
+                        onPress={() => showSubMenu(3)}
+                    >
+                        <MenuItem
+                            icon={"settings-outline"}
+                            text="Settings"
+                            isMenuOpen={isMenuOpen}
+                        />
                     </TouchableOpacity>
                 </View>
+                <SubMenu
+                    subMenuSection={subMenuSection}
+                    subMenuHeight={subMenuHeight}
+                />
             </Animated.View>
         </View>
     );
 });
 
+const SubMenu = ({ subMenuSection, subMenuHeight }) => {
+    const { theme } = useContext(FlatListRefContext);
+    return (
+        <Animated.View
+            style={[
+                styles.subMenu,
+                { height: subMenuHeight, backgroundColor: theme.quaternary },
+            ]}
+        >
+            {decideSubMenu(subMenuSection)}
+        </Animated.View>
+    );
+};
+
+const decideSubMenu = (subMenuSection) => {
+    switch (subMenuSection) {
+        case 0:
+            return <ThemeSubMenu />;
+        case 1:
+            return <ExportSubMenu />;
+        case 2:
+            return <ImportSubMenu />;
+        case 3:
+            return <SettingsSubMenu />;
+        default:
+            return <ThemeSubMenu />;
+    }
+};
+
+const ThemeSubMenu = () => {
+    return (
+        <View style={styles.subMenuContainer}>
+            <Text style={styles.subMenuText}>Themes</Text>
+        </View>
+    );
+};
+
+const ExportSubMenu = () => {
+    return (
+        <View style={styles.subMenuContainer}>
+            <Text style={styles.subMenuText}>Export</Text>
+        </View>
+    );
+};
+
+const ImportSubMenu = () => {
+    return (
+        <View style={styles.subMenuContainer}>
+            <Text style={styles.subMenuText}>Import</Text>
+        </View>
+    );
+};
+
+const SettingsSubMenu = () => {
+    return (
+        <View style={styles.subMenuContainer}>
+            <Text style={styles.subMenuText}>Settings</Text>
+        </View>
+    );
+};
+
 const MenuItem = (props) => {
+    const { theme } = useContext(FlatListRefContext);
+
     return (
         <View
             style={{
@@ -155,14 +247,18 @@ const MenuItem = (props) => {
                 style={{
                     width: "15%",
                     height: "100%",
-                    backgroundColor: "rgba(44, 62, 80, 0.4)",
+                    backgroundColor: theme.quinary,
                     justifyContent: "center",
                     alignItems: "center",
                 }}
             >
-                <Ionicons name={props.icon} size={30} color="white" />
+                <Ionicons name={props.icon} size={30} color={theme.primary} />
             </View>
-            <Text style={styles.menuItemText}>{props.text}</Text>
+            {props.isMenuOpen && (
+                <Text style={[styles.menuItemText, { color: theme.primary }]}>
+                    {props.text}
+                </Text>
+            )}
         </View>
     );
 };
@@ -173,11 +269,9 @@ const styles = {
         top: 0,
         left: 0,
         bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
         zIndex: 5,
     },
     subContainer: {
-        backgroundColor: "#2B303A",
         position: "relative",
         height: "100%",
     },
@@ -185,13 +279,29 @@ const styles = {
         flexDirection: "row",
         alignItems: "center",
         height: screenHeight / 11,
-        backgroundColor: "rgba(0,0,0,0.1)",
     },
     menuItemText: {
         fontSize: 17,
         marginLeft: 10,
-        color: "white",
         fontWeight: "500",
+        width: "100%",
+    },
+    subMenu: {
+        position: "absolute",
+        bottom: 0,
+        right: 0,
+        width: "100%",
+        zIndex: 5,
+    },
+    subMenuContainer: {
+        width: "100%",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    subMenuText: {
+        fontSize: 20,
+        color: "white",
     },
 };
 

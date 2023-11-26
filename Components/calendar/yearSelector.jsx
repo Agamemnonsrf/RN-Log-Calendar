@@ -11,8 +11,6 @@ import { AntDesign } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
 
-const windowWidth = Dimensions.get("window").width;
-const childrenWidth = windowWidth * 0.83;
 const windowHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
 
@@ -20,7 +18,7 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
     const [selectedYear, setSelectedYear] = useState(currentYear);
 
     const textScale = useRef(new Animated.Value(1)).current;
-    const { selectNewYear } = useContext(FlatListRefContext);
+    const { selectNewYear, theme } = useContext(FlatListRefContext);
     const AnimatedText = Animated.createAnimatedComponent(Text);
 
     const debounce = (func, delay) => {
@@ -66,10 +64,10 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 marginBottom: 10,
-                backgroundColor: "rgba(41, 128, 185, 0.4)",
+                backgroundColor: theme.secondary,
                 borderRadius: 10,
                 padding: 5,
-                height: windowHeight / 7,
+                height: windowHeight / 9,
             }}
         >
             <Pressable
@@ -83,15 +81,15 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
                 <AntDesign
                     name="caretleft"
                     size={20}
-                    color="rgba(255,255,255,0.6)"
+                    color={theme.primaryMidFade}
                 />
             </Pressable>
             <AnimatedText
                 style={{
-                    fontSize: (windowHeight / 7) * 0.6,
+                    fontSize: (windowHeight / 7) * 0.5,
                     fontFamily: "sans-serif",
                     fontWeight: "bold",
-                    color: "white",
+                    color: theme.primary,
                     letterSpacing: 8,
                     transform: [{ scale: textScale }],
                 }}
@@ -109,7 +107,7 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
                 <AntDesign
                     name="caretright"
                     size={20}
-                    color="rgba(255,255,255,0.6)"
+                    color={theme.primaryMidFade}
                 />
             </Pressable>
         </Animated.View>

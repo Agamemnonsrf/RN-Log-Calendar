@@ -23,7 +23,7 @@ export default CurrentMonth = ({
     setCurrentYear,
     currentYear,
 }) => {
-    const { dayRef } = useContext(FlatListRefContext);
+    const { theme } = useContext(FlatListRefContext);
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -107,7 +107,7 @@ export default CurrentMonth = ({
             />
             {/* <Animated.View style={trailStyle} /> */}
             <View style={{ height: "10%" }}>
-                <Text style={[styles.textDark, styles.bigText]}>
+                <Text style={[styles.bigText, { color: theme.primary }]}>
                     {months[decideMonthForArray(currentMonth)].fullName}
                 </Text>
             </View>
@@ -125,10 +125,10 @@ export default CurrentMonth = ({
                             {oneLetterDays.map((item, index) => (
                                 <Text
                                     key={index}
-                                    style={[
-                                        styles.textDark,
-                                        { marginHorizontal: 15 },
-                                    ]}
+                                    style={{
+                                        marginHorizontal: 15,
+                                        color: theme.primary,
+                                    }}
                                 >
                                     {item}
                                 </Text>
@@ -180,7 +180,6 @@ export default CurrentMonth = ({
 
 const styles = StyleSheet.create({
     textDark: {
-        color: "white",
         fontFamily: "Roboto",
     },
     bigText: {

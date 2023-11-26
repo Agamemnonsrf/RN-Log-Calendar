@@ -6,13 +6,14 @@ import Layout from "./Components/layout/layout";
 import FlatListRefContext from "./Components/context/flatListContext";
 import CurrentMonth from "./Components/calendar/currentMonth";
 import BarsMenuIcon from "./Components/layout/BarsMenuIcon";
-import Constants from "expo-constants";
+import colorThemes from "./Components/data/themes";
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [theme, setTheme] = useState(colorThemes["defaultDark"]);
 
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
@@ -72,9 +73,15 @@ export default function App() {
                 dropDownRef,
                 sideMenuRef,
                 dayRef,
+                theme,
             }}
         >
-            <View style={[styles.container, styles.backgroundDark]}>
+            <View
+                style={[
+                    styles.container,
+                    { backgroundColor: theme.background },
+                ]}
+            >
                 <Layout>
                     <Animated.View
                         style={{
@@ -84,9 +91,8 @@ export default function App() {
                     >
                         <View
                             style={{
-                                position: "absolute",
-                                top: 5,
-                                right: 0,
+                                height: 50,
+                                width: "100%",
                             }}
                         >
                             <BarsMenuIcon />
@@ -109,24 +115,5 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-    },
-
-    backgroundLight: {
-        backgroundColor: "white",
-    },
-    backgroundDark: {
-        backgroundColor: "#2B303A",
-    },
-    textDark: {
-        color: "white",
-    },
-    bigText: {
-        fontSize: 34,
-    },
-
-    monthText: {
-        fontSize: 44,
-        fontWeight: "bold",
-        color: "white",
     },
 });

@@ -22,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { months } from "../data/data";
 import SyncedIcon from "./SyncedIcon";
 import Spinner from "./Spinner";
+import FlatListRefContext from "../context/flatListContext";
 
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
@@ -61,7 +62,7 @@ export default Dropdown = forwardRef((_, ref) => {
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
-
+    const { theme } = useContext(FlatListRefContext);
     const dropdownHeight = useRef(new Animated.Value(0)).current;
     const textOffset = useRef(new Animated.Value(1)).current;
     const initialRender = useRef(true);
@@ -267,7 +268,10 @@ export default Dropdown = forwardRef((_, ref) => {
                 <Animated.View
                     style={[
                         styles.subContainer,
-                        { height: subContainerHeight },
+                        {
+                            height: subContainerHeight,
+                            backgroundColor: theme.background,
+                        },
                     ]}
                     onStartShouldSetResponder={() => true}
                 >
@@ -277,10 +281,16 @@ export default Dropdown = forwardRef((_, ref) => {
                                 styles.textContainer,
                                 {
                                     left: multipliedOffset,
+                                    backgroundColor: theme.secondary,
                                 },
                             ]}
                         >
-                            <Text style={[styles.textDark, styles.textBig]}>
+                            <Text
+                                style={[
+                                    { color: theme.primary },
+                                    styles.textBig,
+                                ]}
+                            >
                                 {date.getDate()} {months[date.getMonth()].name}{" "}
                                 {date.getFullYear()} {isToday && "(Today)"}
                             </Text>
@@ -305,7 +315,7 @@ export default Dropdown = forwardRef((_, ref) => {
                                     borderRadius: 5,
                                     borderWidth:
                                         selectedColor === color ? 2 : 0,
-                                    borderColor: "white",
+                                    borderColor: theme.primary,
                                 }}
                                 onPress={() => handleSelectColor(color)}
                             />
@@ -314,7 +324,11 @@ export default Dropdown = forwardRef((_, ref) => {
                     <Animated.View
                         style={[
                             styles.bottomBar,
-                            { height: 25, left: multipliedOffset },
+                            {
+                                height: 25,
+                                left: multipliedOffset,
+                                backgroundColor: theme.quaternary,
+                            },
                         ]}
                         {...panResponder.panHandlers}
                     >
@@ -349,10 +363,12 @@ export default Dropdown = forwardRef((_, ref) => {
                         styles.textInput,
                         {
                             height: textInputHeight,
+                            backgroundColor: theme.tertiary,
+                            color: theme.primary,
                         },
                     ]}
                     placeholder="Your notes here..."
-                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    placeholderTextColor={theme.primaryHighFade}
                 />
             </Animated.View>
         </>
@@ -369,16 +385,13 @@ const styles = StyleSheet.create({
         zIndex: 5,
     },
     subContainer: {
-        backgroundColor: "#2B303A",
         position: "relative",
     },
-    textDark: { color: "white" },
     textBig: { fontSize: 25, fontWeight: "bold" },
     textContainer: {
         padding: 10,
         position: "absolute",
         top: 0,
-        backgroundColor: "rgba(41, 128, 185, 0.4)",
         borderRadius: 10,
         padding: 5,
         marginTop: 10,
@@ -386,10 +399,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         padding: 10,
-        backgroundColor: "#62666e",
         borderRadius: 5,
         textAlignVertical: "top",
-        color: "white",
         fontSize: 18,
     },
     inputContainer: {
@@ -400,7 +411,6 @@ const styles = StyleSheet.create({
         right: 0,
     },
     bottomBar: {
-        backgroundColor: "#494949",
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",

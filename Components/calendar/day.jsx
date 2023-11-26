@@ -17,10 +17,10 @@ const childrenWidth = windowWidth * 0.83;
 const windowHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
 const containerWidth = (childrenWidth / 7) * 0.9;
-const containerHeight = windowHeight / 10;
+const containerHeight = windowHeight / 11;
 
 export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
-    const { dropDownRef } = useContext(FlatListRefContext);
+    const { dropDownRef, theme } = useContext(FlatListRefContext);
     const [hasData, setHasData] = useState("");
     const [color, setColor] = useState("");
 
@@ -63,9 +63,9 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     borderWidth: isToday ? 2 : 1,
                     borderColor: isCurrentMonth
                         ? isToday
-                            ? "white"
-                            : "rgba(255,255,255,0.7)"
-                        : "rgba(255,255,255,0.3)",
+                            ? theme.primary
+                            : theme.primaryMidFade
+                        : theme.primaryHighFade,
                     backgroundColor: color ? color : "transparent",
                 },
             ]}
@@ -92,8 +92,8 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                 <Text
                     style={{
                         color: isCurrentMonth
-                            ? "white"
-                            : "rgba(255,255,255,0.8)",
+                            ? theme.primary
+                            : theme.primaryMidFade,
                         padding: 2,
                         fontSize: containerHeight / 5,
                     }}
@@ -108,13 +108,17 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                             size={12}
                             color={
                                 isCurrentMonth
-                                    ? "rgba(255,255,255,0.9)"
-                                    : "rgba(255,255,255,0.5)"
+                                    ? theme.primaryLowFade
+                                    : theme.primaryHighFade
                             }
                         />
                     )}
                     {isToday && (
-                        <MaterialIcons name="today" size={12} color="white" />
+                        <MaterialIcons
+                            name="today"
+                            size={12}
+                            color={theme.primary}
+                        />
                     )}
                 </View>
             </View>

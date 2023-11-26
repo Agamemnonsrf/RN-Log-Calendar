@@ -11,7 +11,8 @@ const monthBoxHeight = windowHeight / 12;
 let gotoMonth;
 
 const Selector = () => {
-    const { currentMonth, selectNewMonth } = useContext(FlatListRefContext);
+    const { currentMonth, selectNewMonth, theme } =
+        useContext(FlatListRefContext);
 
     const topPosition = useRef(
         new Animated.ValueXY({ y: (currentMonth - 1) * monthBoxHeight, x: 0 })
@@ -76,7 +77,11 @@ const Selector = () => {
             style={[
                 styles.selector,
                 topPosition.getLayout(),
-                { left: 0, transform: [{ scale: scale }] },
+                {
+                    left: 0,
+                    transform: [{ scale: scale }],
+                    backgroundColor: theme.primaryVeryHighFade,
+                },
             ]}
         />
     );
@@ -85,11 +90,10 @@ const Selector = () => {
 const styles = StyleSheet.create({
     selector: {
         flex: 1,
-        height: "8.33%",
+        height: monthBoxHeight,
         position: "absolute",
         zIndex: 3,
         width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
     },
 });
 

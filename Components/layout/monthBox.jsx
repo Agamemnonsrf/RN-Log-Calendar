@@ -12,7 +12,7 @@ import { gotoMonth } from "./selector";
 export const MonthBox = ({ month }) => {
     const isTodayMonth = month.id === new Date().getMonth() + 1;
 
-    const { selectNewMonth } = useContext(FlatListRefContext);
+    const { selectNewMonth, theme } = useContext(FlatListRefContext);
 
     const handlePress = () => {
         selectNewMonth(month.id);
@@ -25,7 +25,7 @@ export const MonthBox = ({ month }) => {
                 styles.container,
                 {
                     backgroundColor: isTodayMonth
-                        ? "rgba(255,255,255,0.5)"
+                        ? theme.primaryHighFade
                         : "transparent",
                 },
             ]}
@@ -33,7 +33,7 @@ export const MonthBox = ({ month }) => {
         >
             <Text
                 style={{
-                    color: "white",
+                    color: theme.primary,
                     fontSize: 18,
                     backgroundColor: "transparent",
                     fontWeight: "bold",

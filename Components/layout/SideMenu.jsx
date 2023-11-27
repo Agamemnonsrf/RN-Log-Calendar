@@ -97,11 +97,23 @@ const SideMenu = forwardRef((props, ref) => {
                             {
                                 width: "100%",
                                 backgroundColor: theme.secondary,
-                                justifyContent: "flex-end",
+                                justifyContent: "space-between",
                             },
                         ]}
                         onPress={hideMenu}
                     >
+                        <Text
+                            style={{
+                                color: isMenuOpen
+                                    ? theme.primary
+                                    : theme.secondary,
+                                fontFamily: "Poppins-Regular",
+                                marginLeft: 20,
+                                fontSize: 17,
+                            }}
+                        >
+                            Close
+                        </Text>
                         <Ionicons
                             name="close-outline"
                             size={30}
@@ -259,7 +271,10 @@ const ThemeSubMenu = ({ isMenuOpen }) => {
                                     <Text
                                         style={[
                                             styles.subMenuText,
-                                            { color: item.primary },
+                                            {
+                                                color: item.primary,
+                                                fontFamily: "Poppins-Regular",
+                                            },
                                         ]}
                                     >
                                         {item.name}
@@ -340,7 +355,15 @@ const MenuItem = (props) => {
                 <Ionicons name={props.icon} size={30} color={theme.primary} />
             </View>
             {props.isMenuOpen && (
-                <Text style={[styles.menuItemText, { color: theme.primary }]}>
+                <Text
+                    style={[
+                        styles.menuItemText,
+                        {
+                            color: theme.primary,
+                            fontFamily: "Poppins-Regular",
+                        },
+                    ]}
+                >
                     {props.text}
                 </Text>
             )}
@@ -368,7 +391,6 @@ const styles = {
     menuItemText: {
         fontSize: 17,
         marginLeft: 10,
-        fontWeight: "500",
         width: "100%",
     },
     subMenu: {

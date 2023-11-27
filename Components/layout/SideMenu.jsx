@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
 import colorThemes from "../data/themes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight =
@@ -166,13 +167,14 @@ const SideMenu = forwardRef((props, ref) => {
                 <SubMenu
                     subMenuSection={subMenuSection}
                     subMenuHeight={subMenuHeight}
+                    isMenuOpen={isMenuOpen}
                 />
             </Animated.View>
         </View>
     );
 });
 
-const SubMenu = ({ subMenuSection, subMenuHeight }) => {
+const SubMenu = ({ subMenuSection, subMenuHeight, isMenuOpen }) => {
     const { theme } = useContext(FlatListRefContext);
     return (
         <Animated.View
@@ -182,99 +184,122 @@ const SubMenu = ({ subMenuSection, subMenuHeight }) => {
             ]}
         >
             <View style={styles.subMenuContainer}>
-                {decideSubMenu(subMenuSection)}
+                {decideSubMenu(subMenuSection, isMenuOpen)}
             </View>
         </Animated.View>
     );
 };
 
-const decideSubMenu = (subMenuSection) => {
+const decideSubMenu = (subMenuSection, isMenuOpen) => {
     switch (subMenuSection) {
         case 0:
-            return <ThemeSubMenu />;
+            return <ThemeSubMenu isMenuOpen={isMenuOpen} />;
         case 1:
-            return <ExportSubMenu />;
+            return <ExportSubMenu isMenuOpen={isMenuOpen} />;
         case 2:
-            return <ImportSubMenu />;
+            return <ImportSubMenu isMenuOpen={isMenuOpen} />;
         case 3:
-            return <SettingsSubMenu />;
+            return <SettingsSubMenu isMenuOpen={isMenuOpen} />;
         default:
-            return <ThemeSubMenu />;
+            return <ThemeSubMenu isMenuOpen={isMenuOpen} />;
     }
 };
 
-const ThemeSubMenu = () => {
+const ThemeSubMenu = ({ isMenuOpen }) => {
     const { theme, setTheme } = useContext(FlatListRefContext);
 
-    const changeTheme = (theme) => {
-        setTheme(theme);
-    };
-
     const themesArray = Array.from(Object.values(colorThemes));
+    const handleSetTheme = (themeName) => {
+        setTheme(colorThemes[themeName]);
+        AsyncStorage.setItem("theme", themeName);
+    };
 
     return (
         <View style={{ width: "100%", height: "100%" }}>
-            <FlatList
-                data={themesArray}
-                renderItem={({ item }) => {
-                    const colorArray = Array.from(Object.values(item)).splice(
-                        3
-                    );
+            {isMenuOpen && (
+                <FlatList
+                    data={themesArray}
+                    ListHeaderComponent={() => <View style={{ height: 20 }} />}
+                    ListFooterComponent={() => <View style={{ height: 20 }} />}
+                    renderItem={({ item }) => {
+                        const colorArray = Array.from(
+                            Object.values(item)
+                        ).splice(3);
 
-                    return (
-                        <TouchableOpacity
-                            style={{
-                                width: "90%",
-                                paddingVertical: 10,
-                                height: 100,
-                                margin: 15,
-                                backgroundColor: item.background,
-                                borderRadius: 10,
-                                justifyContent: "space-around",
-                                alignItems: "flex-start",
-                                shadowColor: item.background,
-                                shadowOffset: {
-                                    width: 0,
-                                    height: 2,
-                                },
-                                shadowOpacity: 0.75,
-                                shadowRadius: 3.84,
-                                elevation: 5,
-                            }}
-                            onPress={() => setTheme(colorThemes[item.name])}
-                        >
-                            <Text
-                                style={[
-                                    styles.subMenuText,
-                                    { color: item.primary },
-                                ]}
-                            >
-                                {item.name}
-                            </Text>
-                            <View
+                        return (
+                            <TouchableOpacity
                                 style={{
-                                    flexDirection: "row",
-                                    width: "100%",
-                                    justifyContent: "space-evenly",
+                                    width: "90%",
+                                    paddingVertical: 10,
+                                    height: 100,
+                                    marginVertical: 5,
+                                    backgroundColor: item.background,
+                                    borderRadius: 10,
+                                    justifyContent: "space-around",
+                                    alignSelf: "center",
+                                    shadowColor: item.background,
+                                    shadowOffset: {
+                                        width: 2,
+                                        height: 15,
+                                    },
+                                    shadowOpacity: 1,
+                                    shadowRadius: 3.84,
+                                    elevation: 5,
                                 }}
+                                onPress={() => handleSetTheme(item.name)}
                             >
-                                {colorArray.map((color) => {
-                                    return (
-                                        <View
-                                            style={{
-                                                width: 25,
-                                                height: 25,
-                                                backgroundColor: color,
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </View>
-                        </TouchableOpacity>
-                    );
-                }}
-                keyExtractor={(item) => item.name}
-            />
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        width: "100%",
+                                        paddingHorizontal: 15,
+                                    }}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.subMenuText,
+                                            { color: item.primary },
+                                        ]}
+                                    >
+                                        {item.name}
+                                    </Text>
+                                    <View>
+                                        {theme.name === item.name && (
+                                            <Ionicons
+                                                name="checkmark-circle"
+                                                size={24}
+                                                color={item.primary}
+                                            />
+                                        )}
+                                    </View>
+                                </View>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        width: "100%",
+                                        justifyContent: "space-evenly",
+                                    }}
+                                >
+                                    {colorArray.map((color) => {
+                                        return (
+                                            <View
+                                                style={{
+                                                    width: 25,
+                                                    height: 25,
+                                                    backgroundColor: color,
+                                                }}
+                                                key={color + item.name}
+                                            />
+                                        );
+                                    })}
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    }}
+                    keyExtractor={(item) => item.name}
+                />
+            )}
         </View>
     );
 };

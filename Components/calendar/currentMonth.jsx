@@ -107,7 +107,12 @@ export default CurrentMonth = ({
             />
             {/* <Animated.View style={trailStyle} /> */}
             <View style={{ height: "10%" }}>
-                <Text style={[styles.bigText, { color: theme.primary }]}>
+                <Text
+                    style={[
+                        styles.bigText,
+                        { color: theme.primary, fontFamily: "Poppins-Regular" },
+                    ]}
+                >
                     {months[decideMonthForArray(currentMonth)].fullName}
                 </Text>
             </View>
@@ -185,6 +190,5 @@ const styles = StyleSheet.create({
     bigText: {
         fontSize: 34,
         marginBottom: 10,
-        fontWeight: "bold",
     },
 });

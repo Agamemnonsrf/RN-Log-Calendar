@@ -1,24 +1,73 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { StyleSheet, Animated, View, Dimensions } from "react-native";
+import { StyleSheet, Animated, View, Dimensions, Text } from "react-native";
 import Layout from "./Components/layout/layout";
 
 import FlatListRefContext from "./Components/context/flatListContext";
 import CurrentMonth from "./Components/calendar/currentMonth";
 import BarsMenuIcon from "./Components/layout/BarsMenuIcon";
 import colorThemes from "./Components/data/themes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+//expo splashscreen
+import * as SplashScreen from "expo-splash-screen";
+import { useFonts } from "expo-font";
 
 const screenWidth = Dimensions.get("window").width;
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [theme, setTheme] = useState(colorThemes["defaultDark"]);
-
+    const [appIsReady, setAppIsReady] = useState(false);
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
     const sideMenuRef = useRef();
     const dayRef = useRef();
+    const [fontsLoaded] = useFonts({
+        "Poppins-Black": require("./assets/fonts/Poppins/Poppins-Black.ttf"),
+        "Poppins-Bold": require("./assets/fonts/Poppins/Poppins-Bold.ttf"),
+        "Poppins-SemiBold": require("./assets/fonts/Poppins/Poppins-SemiBold.ttf"),
+        "Poppins-Regular": require("./assets/fonts/Poppins/Poppins-Regular.ttf"),
+        "Poppins-Medium": require("./assets/fonts/Poppins/Poppins-Medium.ttf"),
+        "Poppins-Light": require("./assets/fonts/Poppins/Poppins-Light.ttf"),
+    });
+
+    useEffect(() => {
+        async function prepare() {
+            try {
+                const theme = await AsyncStorage.getItem("theme");
+                if (theme) {
+                    setTheme(colorThemes[theme]);
+                } else {
+                    await AsyncStorage.setItem("theme", "defaultDark");
+                }
+            } catch (e) {
+                console.warn(e);
+            } finally {
+                setAppIsReady(true);
+            }
+        }
+        prepare();
+    }, []);
+
+    useEffect(() => {
+        Animated.timing(position1, {
+            toValue: 0,
+            duration: 400,
+            useNativeDriver: false,
+        }).start();
+    }, [currentMonth, currentYear]);
+
+    const onLayoutRootView = useCallback(async () => {
+        if (appIsReady) {
+            await SplashScreen.hideAsync();
+        }
+    }, [appIsReady]);
+
+    if (!appIsReady || !fontsLoaded) {
+        return null;
+    }
 
     const selectNewMonth = (newMonth) => {
         let newMonthCall;
@@ -54,14 +103,6 @@ export default function App() {
         });
     };
 
-    useEffect(() => {
-        Animated.timing(position1, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: false,
-        }).start();
-    }, [currentMonth, currentYear]);
-
     return (
         <FlatListRefContext.Provider
             value={{
@@ -82,6 +123,7 @@ export default function App() {
                     styles.container,
                     { backgroundColor: theme.background },
                 ]}
+                onLayout={onLayoutRootView}
             >
                 <Layout>
                     <Animated.View

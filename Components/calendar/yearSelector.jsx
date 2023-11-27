@@ -87,8 +87,7 @@ export default YearSelector = ({ setCurrentYear, currentYear }) => {
             <AnimatedText
                 style={{
                     fontSize: (windowHeight / 7) * 0.5,
-                    fontFamily: "sans-serif",
-                    fontWeight: "bold",
+                    fontFamily: "Poppins-SemiBold",
                     color: theme.primary,
                     letterSpacing: 8,
                     transform: [{ scale: textScale }],

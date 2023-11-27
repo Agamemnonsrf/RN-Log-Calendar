@@ -16,8 +16,7 @@ import FlatListRefContext from "../context/flatListContext";
 import SideMenu from "./SideMenu.jsx";
 
 const Layout = ({ children }) => {
-    const { dropDownRef } = useContext(FlatListRefContext);
-    const { sideMenuRef } = useContext(FlatListRefContext);
+    const { dropDownRef, sideMenuRef, theme } = useContext(FlatListRefContext);
 
     return (
         <View style={styles.container}>
@@ -25,7 +24,12 @@ const Layout = ({ children }) => {
             <Dropdown ref={dropDownRef} />
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
-                <View style={styles.monthsContainer}>
+                <View
+                    style={[
+                        styles.monthsContainer,
+                        { backgroundColor: theme.secondary },
+                    ]}
+                >
                     {months.map((month) => (
                         <MonthBox month={month} key={month.id} />
                     ))}

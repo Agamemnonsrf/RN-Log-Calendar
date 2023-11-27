@@ -5,7 +5,7 @@ import {
     View,
     Text,
     StyleSheet,
-    TouchableHighlight,
+    TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -56,14 +56,18 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
     }, []);
 
     return (
-        <TouchableHighlight
+        <TouchableOpacity
             style={[
                 styles.container,
                 {
-                    borderWidth: isToday ? 2 : 1,
+                    borderWidth: isToday ? 3 : 1,
                     borderColor: isCurrentMonth
                         ? isToday
-                            ? theme.primary
+                            ? color
+                                ? color.replace("0.4", "1")
+                                : theme.primary
+                            : color
+                            ? color.replace("0.4", "1")
                             : theme.primaryMidFade
                         : theme.primaryHighFade,
                     backgroundColor: color ? color : "transparent",
@@ -96,6 +100,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                             : theme.primaryMidFade,
                         padding: 2,
                         fontSize: containerHeight / 5,
+                        fontFamily: "Poppins-Light",
                     }}
                     adjustsFontSizeToFit={true}
                 >
@@ -122,7 +127,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     )}
                 </View>
             </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
     );
 };
 

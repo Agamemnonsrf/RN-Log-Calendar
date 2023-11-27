@@ -36,7 +36,7 @@ export const MonthBox = ({ month }) => {
                     color: theme.primary,
                     fontSize: 18,
                     backgroundColor: "transparent",
-                    fontWeight: "bold",
+                    fontFamily: "Poppins-Regular",
                 }}
             >
                 {month.name}

@@ -15,6 +15,7 @@ import {
     Text,
     TextInput,
     BackHandler,
+    Keyboard,
     PanResponder,
 } from "react-native";
 import Constants from "expo-constants";
@@ -24,11 +25,10 @@ import SyncedIcon from "./SyncedIcon";
 import Spinner from "./Spinner";
 import FlatListRefContext from "../context/flatListContext";
 
-const screenHeight =
-    Dimensions.get("window").height - Constants.statusBarHeight;
+const screenHeight = Dimensions.get("window").height;
 
 const screenWidth = Dimensions.get("window").width;
-
+const initialSubContainerHeight = screenHeight * 0.5;
 const colors = [
     "rgba(44, 62, 80, 1)", // Wet Asphalt
     "rgba(52, 73, 94, 1)", // Midnight Blue
@@ -62,6 +62,7 @@ export default Dropdown = forwardRef((_, ref) => {
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
     const { theme } = useContext(FlatListRefContext);
     const dropdownHeight = useRef(new Animated.Value(0)).current;
     const textOffset = useRef(new Animated.Value(1)).current;
@@ -72,8 +73,6 @@ export default Dropdown = forwardRef((_, ref) => {
     //panResponder for panning the dropdown with the bottombar
     // In the Dropdown component
     const subContainerHeight = useRef(new Animated.Value(0)).current;
-
-    const initialSubContainerHeight = 350;
 
     const panResponder = useRef(
         PanResponder.create({
@@ -144,6 +143,7 @@ export default Dropdown = forwardRef((_, ref) => {
         setDate(new Date(year, month - 1, day));
         onChangeText(data);
     };
+
     const hideDropdown = () => {
         if (setHasDataRef.current) {
             setHasDataRef.current(text);
@@ -153,10 +153,12 @@ export default Dropdown = forwardRef((_, ref) => {
         }
         setDropdownVisible(false);
     };
+
     const backAction = () => {
         hideDropdown();
         return true; // This will stop the event from bubbling up and closing the app.
     };
+
     useEffect(() => {
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
@@ -166,8 +168,6 @@ export default Dropdown = forwardRef((_, ref) => {
             backHandler.remove();
         };
     }, [text, selectedColor]);
-
-    useEffect(() => { }, [isDropdownVisible]);
 
     useEffect(() => {
         if (initialRender.current) {
@@ -249,7 +249,9 @@ export default Dropdown = forwardRef((_, ref) => {
             try {
                 await AsyncStorage.setItem(date.toDateString(), text);
                 setLoading(false); // Set loading to false after saving is complete
-            } catch (e) { }
+            } catch (e) {
+                console.log(e);
+            }
         }, 500)
     ).current;
 
@@ -260,118 +262,111 @@ export default Dropdown = forwardRef((_, ref) => {
     };
 
     return (
-        <>
-            <AnimatedPressable
-                style={[{ height: dropdownHeight }, styles.container]}
-                onPress={hideDropdown}
+        <AnimatedPressable
+            style={[{ height: dropdownHeight }, styles.container]}
+            onPress={hideDropdown}
+            onStartShouldSetResponder={() => true}
+        >
+            <Animated.View
+                style={[
+                    styles.subContainer,
+                    {
+                        height: subContainerHeight,
+                        backgroundColor: theme.background,
+                    },
+                ]}
             >
                 <Animated.View
                     style={[
-                        styles.subContainer,
+                        styles.inputContainer,
                         {
-                            height: subContainerHeight,
-                            backgroundColor: theme.background,
+                            left: multipliedOffset,
+                            width: "100%",
+                            marginTop: Constants.statusBarHeight + 10,
                         },
                     ]}
-                    onStartShouldSetResponder={() => true}
                 >
-                    <View style={{ position: "relative" }}>
-                        <Animated.View
-                            style={[
-                                styles.textContainer,
-                                {
-                                    left: multipliedOffset,
-                                    backgroundColor: theme.secondary,
-                                },
-                            ]}
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            margin: 10,
+                        }}
+                    >
+                        <View
+                            style={{
+                                color: theme.background,
+                                backgroundColor: theme.primary,
+                                borderRadius: 100,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                paddingHorizontal: 5,
+                            }}
                         >
                             <Text
                                 style={[
-                                    { color: theme.primary },
-                                    styles.textBig,
+                                    {
+                                        fontFamily: "Poppins-Medium",
+                                    },
                                 ]}
                             >
                                 {date.getDate()} {months[date.getMonth()].name}{" "}
                                 {date.getFullYear()} {isToday && "(Today)"}
                             </Text>
-                        </Animated.View>
+                        </View>
+                        <View
+                            style={{
+                                color: theme.background,
+                                backgroundColor: theme.primary,
+                                borderRadius: 100,
+                                justifyContent: "center",
+                                paddingHorizontal: 5,
+                            }}
+                        >
+                            {loading ? <Spinner /> : <SyncedIcon />}
+                        </View>
                     </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            position: "absolute",
-                            bottom: 25,
-                        }}
-                    >
-                        {colors.map((color, index) => (
-                            <Pressable
-                                key={index}
-                                style={{
-                                    backgroundColor: color,
-                                    height: screenWidth / 6 - 10,
-                                    width: screenWidth / 6 - 10,
-                                    margin: 5,
-                                    borderRadius: 5,
-                                    borderWidth:
-                                        selectedColor === color ? 2 : 0,
-                                    borderColor: theme.primary,
-                                }}
-                                onPress={() => handleSelectColor(color)}
-                            />
-                        ))}
-                    </View>
-                    <Animated.View
+                    <TextInput
+                        editable
+                        multiline
+                        numberOfLines={8}
+                        maxLength={2000}
+                        onChangeText={(text) => handleTextChange(text)}
+                        value={text}
                         style={[
-                            styles.bottomBar,
+                            styles.textInput,
                             {
-                                height: 25,
-                                left: multipliedOffset,
-                                backgroundColor: theme.quaternary,
+                                backgroundColor: theme.tertiary,
+                                color: theme.primary,
+                                height: "70%",
                             },
                         ]}
-                        {...panResponder.panHandlers}
-                    >
-                        <Animated.View
-                            style={{
-                                borderTopWidth: 2,
-                                borderTopColor: borderTopColor,
-                                width: "50%",
-                            }}
-                        />
-                    </Animated.View>
+                        placeholder="Your notes here..."
+                        placeholderTextColor={theme.primaryHighFade}
+                    />
                 </Animated.View>
-            </AnimatedPressable>
-
-            <Animated.View
-                style={[
-                    styles.inputContainer,
-                    { left: multipliedOffset, width: "100%" },
-                ]}
-            >
-                <View style={{ alignItems: "flex-end", height: 30 }}>
-                    {loading ? <Spinner /> : <SyncedIcon />}
-                </View>
-                <TextInput
-                    editable
-                    multiline
-                    numberOfLines={8}
-                    maxLength={2000}
-                    onChangeText={(text) => handleTextChange(text)}
-                    value={text}
+                <Animated.View
                     style={[
-                        styles.textInput,
+                        styles.bottomBar,
                         {
-                            height: "100%",
-                            backgroundColor: theme.tertiary,
-                            color: theme.primary,
+                            height: 25,
+                            left: multipliedOffset,
+                            backgroundColor: theme.quaternary,
                         },
                     ]}
-                    placeholder="Your notes here..."
-                    placeholderTextColor={theme.primaryHighFade}
-                />
+                    {...panResponder.panHandlers}
+                >
+                    <Animated.View
+                        style={{
+                            borderTopWidth: 2,
+                            borderTopColor: borderTopColor,
+                            width: "50%",
+                        }}
+                    />
+                </Animated.View>
             </Animated.View>
-        </>
+        </AnimatedPressable>
     );
 });
 
@@ -384,31 +379,17 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0,0,0,0.5)",
         zIndex: 5,
     },
-    subContainer: {
-        position: "relative",
-    },
+    subContainer: {},
     textBig: { fontSize: 25, fontWeight: "bold" },
-    textContainer: {
-        padding: 10,
-        position: "absolute",
-        top: 0,
-        borderRadius: 10,
-        padding: 5,
-        marginTop: 10,
-        marginLeft: 10,
-    },
     textInput: {
         padding: 10,
         borderRadius: 5,
         textAlignVertical: "top",
         fontSize: 18,
+        marginHorizontal: 10,
     },
     inputContainer: {
-        padding: 10,
         zIndex: 6,
-        position: "absolute",
-        top: 50,
-        right: 0,
     },
     bottomBar: {
         justifyContent: "center",

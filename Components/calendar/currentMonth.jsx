@@ -15,15 +15,34 @@ import FlatListRefContext from "../context/flatListContext";
 
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
-
+const screenWidth = Dimensions.get("window").width;
 const oneLetterDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default CurrentMonth = ({
     currentMonth,
     setCurrentYear,
     currentYear,
+    focused
 }) => {
     const { theme } = useContext(FlatListRefContext);
+    const focusPanRef = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (focused) {
+
+            Animated.spring(focusPanRef, {
+                toValue: 1,
+                duration: 400,
+                useNativeDriver: false,
+            }).start();
+        } else {
+            Animated.spring(focusPanRef, {
+                toValue: 0,
+                duration: 400,
+                useNativeDriver: false,
+            }).start();
+        }
+    }, [focused])
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -90,18 +109,21 @@ export default CurrentMonth = ({
 
     // Calculate the total height of the FlatList
     const totalHeight = numRows * ITEM_HEIGHT;
+    const interpolateFocus = focusPanRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -screenWidth],
+    });
 
     return (
         <View
             style={{
-                justifyContent: "center",
                 alignItems: "center",
                 width: "100%",
-                height: "55%",
+                height: "100%",
             }}
         >
 
-            <View style={{ width: "100%", flexDirection: "row", alignItems: "baseline", borderBottomWidth: 1, borderBottomColor: theme.primaryHighFade }}>
+            <Animated.View style={{ width: "100%", flexDirection: "row", alignItems: "baseline", borderBottomWidth: 1, borderBottomColor: theme.primaryHighFade, left: interpolateFocus }}>
                 <Text
                     style={[
                         styles.bigText,
@@ -118,7 +140,7 @@ export default CurrentMonth = ({
                 }}>
                     {currentYear}
                 </Text>
-            </View>
+            </Animated.View>
 
             <FlatList
                 ListHeaderComponent={() => {
@@ -128,7 +150,6 @@ export default CurrentMonth = ({
                                 flexDirection: "row",
                                 justifyContent: "space-around",
                                 marginVertical: 10,
-                                backgroundColor: theme.secondary,
                                 borderRadius: 100,
                                 paddingVertical: 7,
                                 alignItems: "center",

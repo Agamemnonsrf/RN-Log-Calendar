@@ -10,14 +10,15 @@ import {
 } from "react-native";
 import FlatListRefContext from "../context/flatListContext";
 import SideMenu from "./SideMenu.jsx";
+import Dropdown from "../calendar/dropdown.jsx";
 
 const Layout = ({ children }) => {
-    const { sideMenuRef, theme } = useContext(FlatListRefContext);
+    const { sideMenuRef, theme, dropDownRef } = useContext(FlatListRefContext);
 
     return (
         <View style={styles.container}>
             <SideMenu ref={sideMenuRef} />
-            {/* <Dropdown ref={dropDownRef} /> */}
+            <Dropdown ref={dropDownRef} />
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
 

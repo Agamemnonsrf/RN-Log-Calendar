@@ -7,8 +7,22 @@ export default SyncedIcon = () => {
     const { theme } = useContext(FlatListRefContext);
 
     return (
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ color: theme.background, fontFamily: "Poppins-Medium" }}>Synced </Text>
+        <View
+            style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                alignSelf: "flex-end",
+            }}
+        >
+            <Text
+                style={{
+                    color: theme.background,
+                    fontFamily: "Poppins-Medium",
+                }}
+            >
+                Synced{" "}
+            </Text>
             <Feather name="check" size={24} color={theme.background} />
         </View>
     );

@@ -112,7 +112,6 @@ export default function App() {
     });
 
     useEffect(() => {
-        console.log("focused")
         if (focused) {
 
             Animated.spring(focusPanRef, {
@@ -184,9 +183,9 @@ export default function App() {
                             currentYear={currentYear}
                             focused={focused}
                         />
-                        <View style={{ height: "37%" }}>
+                        {/* <View style={{ height: "37%" }}>
                             <NoteInput ref={dropDownRef} focused={focused} setFocused={setFocused} />
-                        </View>
+                        </View> */}
                     </Animated.View>
                 </Layout>
                 <StatusBar style="light" translucent={true} />

@@ -23,7 +23,11 @@ export default SpinnerIcon = () => {
     });
 
     return (
-        <Animated.View style={{ transform: [{ rotate: spin }], margin: 3 }}>
+        <Animated.View
+            style={{
+                transform: [{ rotate: spin }],
+            }}
+        >
             <EvilIcons name="spinner-2" size={24} color={theme.background} />
         </Animated.View>
     );

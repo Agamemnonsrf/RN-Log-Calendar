@@ -84,7 +84,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     position: "relative"
                 }}
             >
-                <View style={{ position: "absolute", top: 0 }}>
+                <View style={{ position: "absolute", top: "25%" }}>
                     {isToday && (
                         <MaterialIcons
                             name="today"
@@ -99,14 +99,14 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                             ? theme.primary
                             : theme.primaryHighFade,
                         padding: 2,
-                        fontSize: containerHeight / 4.5,
+                        fontSize: containerHeight / 4,
                         fontFamily: "Poppins-Light",
                     }}
                     adjustsFontSizeToFit={true}
                 >
                     {day}
                 </Text>
-                <View style={{ position: "absolute", bottom: containerWidth * 0.2, borderRadius: 100, width: containerWidth * 0.5, height: 5, backgroundColor: color ? color : "transparent" }} />
+                <View style={{ position: "absolute", bottom: "35%", borderRadius: 100, width: containerWidth * 0.5, height: 5, backgroundColor: color ? color : "transparent" }} />
             </View>
         </TouchableOpacity>
     );
@@ -115,7 +115,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
 const styles = StyleSheet.create({
     container: {
         width: containerWidth,
-        height: containerWidth,
+        height: containerWidth * 2,
         borderRadius: 100,
         margin: 2,
     },

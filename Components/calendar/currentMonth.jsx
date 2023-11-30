@@ -16,7 +16,7 @@ import FlatListRefContext from "../context/flatListContext";
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
 
-const oneLetterDays = ["M", "T", "W", "T", "F", "S", "S"];
+const oneLetterDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default CurrentMonth = ({
     currentMonth,
@@ -45,10 +45,9 @@ export default CurrentMonth = ({
     };
 
     const decideMonthForArray = (month) => {
-        const adjustedMonth = month;
-        if (adjustedMonth === 12) return 11;
-        if (adjustedMonth === -1) return 0;
-        return adjustedMonth - 1;
+        if (month === 12) return 11;
+        if (month === -1) return 0;
+        return month - 1;
     };
 
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
@@ -97,23 +96,27 @@ export default CurrentMonth = ({
             style={{
                 justifyContent: "center",
                 alignItems: "center",
-                height: screenHeight,
                 width: "100%",
+                height: "55%",
             }}
         >
-            <YearSelector
-                setCurrentYear={setCurrentYear}
-                currentYear={currentYear}
-            />
-            {/* <Animated.View style={trailStyle} /> */}
-            <View style={{ height: "10%" }}>
+
+            <View style={{ width: "100%", flexDirection: "row", alignItems: "baseline", borderBottomWidth: 1, borderBottomColor: theme.primaryHighFade }}>
                 <Text
                     style={[
                         styles.bigText,
-                        { color: theme.primary, fontFamily: "Poppins-Regular" },
+                        { color: theme.primary, fontFamily: "Poppins-Regular", marginLeft: 15 },
                     ]}
                 >
-                    {months[decideMonthForArray(currentMonth)].fullName}
+                    {new Date(Date.UTC(currentYear, decideMonthForArray(currentMonth))).toLocaleDateString(undefined, { month: "long" })}
+                </Text>
+                <Text style={{
+                    color: theme.primaryMidFade,
+                    fontFamily: "Poppins-Regular",
+                    marginLeft: 15,
+                    fontSize: 20
+                }}>
+                    {currentYear}
                 </Text>
             </View>
 
@@ -124,15 +127,19 @@ export default CurrentMonth = ({
                             style={{
                                 flexDirection: "row",
                                 justifyContent: "space-around",
-                                flex: 1,
+                                marginVertical: 10,
+                                backgroundColor: theme.secondary,
+                                borderRadius: 100,
+                                paddingVertical: 7,
+                                alignItems: "center",
                             }}
                         >
                             {oneLetterDays.map((item, index) => (
                                 <Text
                                     key={index}
                                     style={{
-                                        marginHorizontal: 15,
                                         color: theme.primary,
+                                        fontFamily: "Poppins-Light",
                                     }}
                                 >
                                     {item}
@@ -152,11 +159,6 @@ export default CurrentMonth = ({
                             item.month === new Date().getMonth() + 1 &&
                             item.year === new Date().getFullYear()
                         }
-                        style={{
-                            width: "100%",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
                     />
                 )}
                 data={days}
@@ -169,26 +171,22 @@ export default CurrentMonth = ({
                 }
                 numColumns={7}
                 style={{ flexGrow: 0 }}
+                contentContainerStyle={{
+                    justifyContent: "space-around",
+                }}
                 scrollEnabled={false}
                 getItemLayout={(data, index) => ({
                     length: totalHeight,
                     offset: totalHeight * index,
                     index,
                 })}
-                // windowSize={21} // tweak this value as needed
-                // maxToRenderPerBatch={20} // tweak this value as needed
-                // initialNumToRender={14} // tweak this value as needed
             />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    textDark: {
-        fontFamily: "Roboto",
-    },
     bigText: {
         fontSize: 34,
-        marginBottom: 10,
     },
 });

@@ -8,33 +8,19 @@ import {
     Dimensions,
     PanResponder,
 } from "react-native";
-import { months } from "../data/data.js";
-import { MonthBox } from "./monthBox.jsx";
-import { Selector } from "./selector.jsx";
-import Dropdown from "../calendar/dropdown.jsx";
 import FlatListRefContext from "../context/flatListContext";
 import SideMenu from "./SideMenu.jsx";
 
 const Layout = ({ children }) => {
-    const { dropDownRef, sideMenuRef, theme } = useContext(FlatListRefContext);
+    const { sideMenuRef, theme } = useContext(FlatListRefContext);
 
     return (
         <View style={styles.container}>
             <SideMenu ref={sideMenuRef} />
-            <Dropdown ref={dropDownRef} />
+            {/* <Dropdown ref={dropDownRef} /> */}
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
-                <View
-                    style={[
-                        styles.monthsContainer,
-                        { backgroundColor: theme.secondary },
-                    ]}
-                >
-                    {months.map((month) => (
-                        <MonthBox month={month} key={month.id} />
-                    ))}
-                    <Selector />
-                </View>
+
             </View>
         </View>
     );
@@ -47,14 +33,7 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
     },
-    selector: {
-        flex: 1,
-        height: "8.33%",
-        position: "absolute",
-        zIndex: 3,
-        width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-    },
+
     appSquare: {
         flex: 1,
         justifyContent: "center",

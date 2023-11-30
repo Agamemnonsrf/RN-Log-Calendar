@@ -1,9 +1,7 @@
 import React, { useRef, useEffect, useState, useContext } from "react";
 import {
-    View,
     Text,
     Animated,
-    PanResponder,
     Dimensions,
     Pressable,
 } from "react-native";

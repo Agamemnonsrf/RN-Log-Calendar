@@ -13,10 +13,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 
 const windowWidth = Dimensions.get("window").width;
-const childrenWidth = windowWidth * 0.83;
 const windowHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
-const containerWidth = (childrenWidth / 7) * 0.9;
+const containerWidth = windowWidth / 7 - 5;
 const containerHeight = windowHeight / 11;
 
 export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
@@ -60,17 +59,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
             style={[
                 styles.container,
                 {
-                    borderWidth: isToday ? 3 : 1,
-                    borderColor: isCurrentMonth
-                        ? isToday
-                            ? color
-                                ? color.replace("0.4", "1")
-                                : theme.primary
-                            : color
-                            ? color.replace("0.4", "1")
-                            : theme.primaryMidFade
-                        : theme.primaryHighFade,
-                    backgroundColor: color ? color : "transparent",
+                    backgroundColor: "transparent",
                 },
             ]}
             onPress={() =>
@@ -88,36 +77,14 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
             <View
                 style={{
                     padding: 2,
-                    justifyContent: "space-between",
+                    justifyContent: "center",
+                    alignItems: "center",
                     width: "100%",
                     height: "100%",
+                    position: "relative"
                 }}
             >
-                <Text
-                    style={{
-                        color: isCurrentMonth
-                            ? theme.primary
-                            : theme.primaryMidFade,
-                        padding: 2,
-                        fontSize: containerHeight / 5,
-                        fontFamily: "Poppins-Light",
-                    }}
-                    adjustsFontSizeToFit={true}
-                >
-                    {day}
-                </Text>
-                <View style={{ flexDirection: "row" }}>
-                    {hasData && (
-                        <MaterialCommunityIcons
-                            name="script-text"
-                            size={12}
-                            color={
-                                isCurrentMonth
-                                    ? theme.primaryLowFade
-                                    : theme.primaryHighFade
-                            }
-                        />
-                    )}
+                <View style={{ position: "absolute", top: 0 }}>
                     {isToday && (
                         <MaterialIcons
                             name="today"
@@ -126,6 +93,20 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                         />
                     )}
                 </View>
+                <Text
+                    style={{
+                        color: isCurrentMonth
+                            ? theme.primary
+                            : theme.primaryHighFade,
+                        padding: 2,
+                        fontSize: containerHeight / 4.5,
+                        fontFamily: "Poppins-Light",
+                    }}
+                    adjustsFontSizeToFit={true}
+                >
+                    {day}
+                </Text>
+                <View style={{ position: "absolute", bottom: containerWidth * 0.2, borderRadius: 100, width: containerWidth * 0.5, height: 5, backgroundColor: color ? color : "transparent" }} />
             </View>
         </TouchableOpacity>
     );
@@ -134,17 +115,9 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
 const styles = StyleSheet.create({
     container: {
         width: containerWidth,
-        height: containerHeight,
-        borderRadius: 4,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        marginHorizontal: 1,
-        marginVertical: 2,
-    },
-    text: {
-        position: "absolute",
-        top: 5,
-        left: 5,
+        height: containerWidth,
+        borderRadius: 100,
+        margin: 2,
     },
 });
 

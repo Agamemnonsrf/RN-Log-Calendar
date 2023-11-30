@@ -11,6 +11,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //expo splashscreen
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
+import { LinearGradient } from 'expo-linear-gradient';
+import NoteInput from "./Components/calendar/NoteInput";
 
 const screenWidth = Dimensions.get("window").width;
 SplashScreen.preventAutoHideAsync();
@@ -20,10 +22,13 @@ export default function App() {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [theme, setTheme] = useState(colorThemes["defaultDark"]);
     const [appIsReady, setAppIsReady] = useState(false);
+    const [focused, setFocused] = useState(false);
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
     const sideMenuRef = useRef();
     const dayRef = useRef();
+    const focusPanRef = useRef(new Animated.Value(0)).current;
+
     const [fontsLoaded] = useFonts({
         "Poppins-Black": require("./assets/fonts/Poppins/Poppins-Black.ttf"),
         "Poppins-Bold": require("./assets/fonts/Poppins/Poppins-Bold.ttf"),
@@ -65,9 +70,7 @@ export default function App() {
         }
     }, [appIsReady]);
 
-    if (!appIsReady || !fontsLoaded) {
-        return null;
-    }
+
 
     const selectNewMonth = (newMonth) => {
         let newMonthCall;
@@ -103,6 +106,33 @@ export default function App() {
         });
     };
 
+    const interpolateFocus = focusPanRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -screenWidth],
+    });
+
+    useEffect(() => {
+        console.log("focused")
+        if (focused) {
+
+            Animated.spring(focusPanRef, {
+                toValue: 1,
+                duration: 400,
+                useNativeDriver: false,
+            }).start();
+        } else {
+            Animated.spring(focusPanRef, {
+                toValue: 0,
+                duration: 400,
+                useNativeDriver: false,
+            }).start();
+        }
+    }, [focused])
+
+
+    if (!appIsReady || !fontsLoaded) {
+        return null;
+    }
     return (
         <FlatListRefContext.Provider
             value={{
@@ -111,8 +141,8 @@ export default function App() {
                 setCurrentMonth,
                 currentMonth,
                 currentYear,
-                dropDownRef,
                 sideMenuRef,
+                dropDownRef,
                 dayRef,
                 theme,
                 setTheme,
@@ -121,33 +151,45 @@ export default function App() {
             <View
                 style={[
                     styles.container,
-                    { backgroundColor: theme.background },
+
                 ]}
                 onLayout={onLayoutRootView}
             >
+                <LinearGradient
+                    colors={theme.backgroundGradient}
+                    style={styles.background}
+                    end={{ x: 1, y: 1 }}
+                />
                 <Layout>
                     <Animated.View
                         style={{
-                            transform: [{ translateX: position1 }],
+                            transform: [{ translateX: position1, }],
                             width: "100%",
+                            justifyContent: "space-between",
+                            height: "100%"
                         }}
                     >
-                        <View
+                        <Animated.View
                             style={{
                                 height: 50,
                                 width: "100%",
+                                right: interpolateFocus
                             }}
                         >
                             <BarsMenuIcon />
-                        </View>
+                        </Animated.View>
                         <CurrentMonth
                             currentMonth={currentMonth}
                             setCurrentYear={setCurrentYear}
                             currentYear={currentYear}
+                            focused={focused}
                         />
+                        <View style={{ height: "37%" }}>
+                            <NoteInput ref={dropDownRef} focused={focused} setFocused={setFocused} />
+                        </View>
                     </Animated.View>
                 </Layout>
-                <StatusBar style="light" translucent={false} />
+                <StatusBar style="light" translucent={true} />
             </View>
         </FlatListRefContext.Provider>
     );
@@ -158,5 +200,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-    },
+    }, background: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        height: "100%",
+
+    }
 });

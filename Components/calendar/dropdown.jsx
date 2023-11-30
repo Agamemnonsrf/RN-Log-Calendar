@@ -30,30 +30,30 @@ const screenHeight =
 const screenWidth = Dimensions.get("window").width;
 
 const colors = [
-    "rgba(44, 62, 80, 0.4)", // Wet Asphalt
-    "rgba(52, 73, 94, 0.4)", // Midnight Blue
-    "rgba(41, 128, 185, 0.4)", // Belize Hole
-    "rgba(22, 160, 133, 0.4)", // Green Sea
-    "rgba(243, 156, 18, 0.4)", // Orange
-    "rgba(211, 84, 0, 0.4)", // Pumpkin
-    "rgba(189, 195, 199, 0.4)", // Clouds
-    "rgba(127, 140, 141, 0.4)", // Asbestos
-    "rgba(155, 89, 182, 0.4)", // Amethyst
-    "rgba(241, 196, 15, 0.4)", // Sunflower
-    "rgba(230, 126, 34, 0.4)", // Carrot
-    "rgba(231, 76, 60, 0.4)", // Alizarin
-    "rgba(210, 105, 30, 0.4)", // Chocolate
-    "rgba(112, 128, 144, 0.4)", // SlateGray
-    "rgba(70, 130, 180, 0.4)", // SteelBlue
-    "rgba(0, 206, 209, 0.4)", // DarkTurquoise
-    "rgba(60, 179, 113, 0.4)", // MediumSeaGreen
-    "rgba(189, 183, 107, 0.4)", // DarkKhaki
-    "rgba(255, 215, 0, 0.4)", // Gold
-    "rgba(218, 165, 32, 0.4)", // GoldenRod
-    "rgba(205, 133, 63, 0.4)", // Peru
-    "rgba(210, 180, 140, 0.4)", // Tan
-    "rgba(188, 143, 143, 0.4)", // RosyBrown
-    "rgba(255, 99, 71, 0.4)", // Tomato
+    "rgba(44, 62, 80, 1)", // Wet Asphalt
+    "rgba(52, 73, 94, 1)", // Midnight Blue
+    "rgba(41, 128, 185, 1)", // Belize Hole
+    "rgba(22, 160, 133, 1)", // Green Sea
+    "rgba(243, 156, 18, 1)", // Orange
+    "rgba(211, 84, 0, 1)", // Pumpkin
+    "rgba(189, 195, 199, 1)", // Clouds
+    "rgba(127, 140, 141, 1)", // Asbestos
+    "rgba(155, 89, 182, 1)", // Amethyst
+    "rgba(241, 196, 15, 1)", // Sunflower
+    "rgba(230, 126, 34, 1)", // Carrot
+    "rgba(231, 76, 60, 1)", // Alizarin
+    "rgba(210, 105, 30, 1)", // Chocolate
+    "rgba(112, 128, 144, 1)", // SlateGray
+    "rgba(70, 130, 180, 1)", // SteelBlue
+    "rgba(0, 206, 209, 1)", // DarkTurquoise
+    "rgba(60, 179, 113, 1)", // MediumSeaGreen
+    "rgba(189, 183, 107, 1)", // DarkKhaki
+    "rgba(255, 215, 0, 1)", // Gold
+    "rgba(218, 165, 32, 1)", // GoldenRod
+    "rgba(205, 133, 63, 1)", // Peru
+    "rgba(210, 180, 140, 1)", // Tan
+    "rgba(188, 143, 143, 1)", // RosyBrown
+    "rgba(255, 99, 71, 1)", // Tomato
 ];
 
 export default Dropdown = forwardRef((_, ref) => {
@@ -72,7 +72,7 @@ export default Dropdown = forwardRef((_, ref) => {
     //panResponder for panning the dropdown with the bottombar
     // In the Dropdown component
     const subContainerHeight = useRef(new Animated.Value(0)).current;
-    const textInputHeight = 200;
+
     const initialSubContainerHeight = 350;
 
     const panResponder = useRef(
@@ -167,7 +167,7 @@ export default Dropdown = forwardRef((_, ref) => {
         };
     }, [text, selectedColor]);
 
-    useEffect(() => {}, [isDropdownVisible]);
+    useEffect(() => { }, [isDropdownVisible]);
 
     useEffect(() => {
         if (initialRender.current) {
@@ -249,7 +249,7 @@ export default Dropdown = forwardRef((_, ref) => {
             try {
                 await AsyncStorage.setItem(date.toDateString(), text);
                 setLoading(false); // Set loading to false after saving is complete
-            } catch (e) {}
+            } catch (e) { }
         }, 500)
     ).current;
 
@@ -362,7 +362,7 @@ export default Dropdown = forwardRef((_, ref) => {
                     style={[
                         styles.textInput,
                         {
-                            height: textInputHeight,
+                            height: "100%",
                             backgroundColor: theme.tertiary,
                             color: theme.primary,
                         },

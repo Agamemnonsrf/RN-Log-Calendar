@@ -15,13 +15,17 @@ const colorThemes = {
     defaultDark: {
         name: "defaultDark",
         overall: "dark",
-        background: "#2B303A",
+        background: "#333240",
+        backgroundGradient:
+            ["#414857", "#2B303A"]
+        ,
         primary: "white",
+        antithesis: "white",
         primaryLowFade: "rgba(255,255,255,0.9)",
         primaryMidFade: "rgba(255,255,255,0.7)",
         primaryHighFade: "rgba(255,255,255,0.5)",
         primaryVeryHighFade: "rgba(255,255,255,0.2)",
-        secondary: "#2980b966",
+        secondary: "#2F87FF",
         tertiary: "#62666e",
         quaternary: "#3D4452",
         quinary: "#2c3e5066",
@@ -57,6 +61,9 @@ const colorThemes = {
         name: "enhancedDark",
         overall: "dark",
         background: "#1E1E1E",
+        backgroundGradient:
+            ["#414857", "#2B303A"]
+        ,
         primary: "#61dafb",
         primaryLowFade: "rgba(97,218,251,0.9)",
         primaryMidFade: "rgba(97,218,251,0.7)",
@@ -72,6 +79,9 @@ const colorThemes = {
         overall: "dark",
         background: "#191970",
         primary: "#00ced1",
+        backgroundGradient:
+            ["#414857", "#2B303A"]
+        ,
         primaryLowFade: "rgba(0,206,209,0.9)",
         primaryMidFade: "rgba(0,206,209,0.7)",
         primaryHighFade: "rgba(0,206,209,0.5)",
@@ -84,6 +94,9 @@ const colorThemes = {
         name: "charcoalGray",
         overall: "dark",
         background: "#2F4F4F",
+        backgroundGradient:
+            ["#414857", "#2B303A"]
+        ,
         primary: "#dcdcdc",
         primaryLowFade: "rgba(220,220,220,0.9)",
         primaryMidFade: "rgba(220,220,220,0.7)",

@@ -110,10 +110,6 @@ export default function App() {
         });
     };
 
-    // ...existing code...
-
-    // ...existing code...
-
     if (!appIsReady || !fontsLoaded) {
         return null;
     }
@@ -145,19 +141,31 @@ export default function App() {
                             transform: [{ translateX: position1 }],
                             width: "100%",
                             height: "100%",
+                            alignItems: "center",
                         }}
                     >
                         <View
                             style={{
-                                height: "10%",
+                                height: "15%",
                                 width: "100%",
+                                flexDirection: "row",
+                                alignItems: "flex-end",
+                                justifyContent: "space-between",
+                                zIndex: 10,
+                                borderBottomWidth: 1,
+                                borderBottomColor: theme.primaryHighFade,
                             }}
                         >
+                            <MonthSelector
+                                currentYear={currentYear}
+                                currentMonth={currentMonth}
+                            />
                             <BarsMenuIcon />
                         </View>
+
                         <View
                             style={{
-                                height: "60%",
+                                height: "55%",
                                 width: "100%",
                             }}
                         >

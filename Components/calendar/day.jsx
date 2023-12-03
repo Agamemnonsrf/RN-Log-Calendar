@@ -85,7 +85,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     height: 30,
                 }}
             >
-                {/* <View style={{ position: "absolute", top: "-5%" }}>
+                <View style={{ position: "absolute", top: "-20%" }}>
                     {isToday && (
                         <MaterialIcons
                             name="today"
@@ -93,13 +93,11 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                             color={theme.primary}
                         />
                     )}
-                </View> */}
+                </View>
                 <Text
                     style={{
                         color: isCurrentMonth
-                            ? isToday
-                                ? theme.secondaryVibrant
-                                : theme.primary
+                            ? theme.primary
                             : theme.primaryHighFade,
                         fontSize: containerHeight / 3.5,
                         fontFamily: "Poppins-Light",

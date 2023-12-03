@@ -184,9 +184,9 @@ export default NoteInput = forwardRef(({}, ref) => {
                 style={{
                     justifyContent: "flex-start",
                     alignItems: "center",
-                    zIndex: 12,
+                    zIndex: 13,
                     bottom: interpolateFocus,
-                    height: "100%",
+                    width: "100%",
                 }}
             >
                 <Animated.View
@@ -286,7 +286,7 @@ export default NoteInput = forwardRef(({}, ref) => {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    zIndex: 10,
+                    zIndex: 12,
                     backgroundColor: "black",
                     opacity: interpolatedOpacity,
                     height: interpolatedHeight,

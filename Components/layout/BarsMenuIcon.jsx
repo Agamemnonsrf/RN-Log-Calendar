@@ -4,20 +4,17 @@ import { Octicons } from "@expo/vector-icons";
 import FlatListRefContext from "../context/flatListContext";
 import Constants from "expo-constants";
 
-
 export default BarsMenuIcon = () => {
     const { sideMenuRef, theme } = useContext(FlatListRefContext);
 
     return (
         <TouchableOpacity
             style={{
-                height: "100%",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: 10,
-                alignSelf: "flex-end",
-                padding: 10,
-                marginTop: Constants.statusBarHeight,
+                right: 10,
+                position: "absolute",
+                bottom: 10,
             }}
             onPress={() => sideMenuRef.current.showMenu()}
         >

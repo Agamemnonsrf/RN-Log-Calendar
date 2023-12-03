@@ -11,6 +11,7 @@ import Day from "./day";
 import YearSelector from "./yearSelector";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
+import MonthSelector from "./MonthSelector";
 
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
@@ -94,46 +95,23 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
     return (
         <View
             style={{
-                alignItems: "center",
                 width: "100%",
                 height: "100%",
-                justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "flex-start",
             }}
         >
-            <Animated.View
+            <Text
                 style={{
-                    width: "100%",
-                    flexDirection: "row",
-                    alignItems: "baseline",
-                    borderBottomWidth: 1,
-                    borderBottomColor: theme.primaryHighFade,
+                    color: theme.primaryMidFade,
+                    fontFamily: "Poppins-Regular",
+                    right: 10,
+                    fontSize: 20,
+                    position: "absolute",
                 }}
             >
-                <Text
-                    style={[
-                        styles.bigText,
-                        {
-                            color: theme.primary,
-                            fontFamily: "Poppins-Regular",
-                            marginLeft: 15,
-                        },
-                    ]}
-                >
-                    {new Date(
-                        Date.UTC(currentYear, decideMonthForArray(currentMonth))
-                    ).toLocaleDateString(undefined, { month: "long" })}
-                </Text>
-                <Text
-                    style={{
-                        color: theme.primaryMidFade,
-                        fontFamily: "Poppins-Regular",
-                        marginLeft: 15,
-                        fontSize: 20,
-                    }}
-                >
-                    {currentYear}
-                </Text>
-            </Animated.View>
+                {currentYear}
+            </Text>
 
             <View
                 style={{
@@ -150,6 +128,7 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
                                 style={{
                                     flexDirection: "row",
                                     width: "100%",
+                                    zIndex: -10,
                                 }}
                             >
                                 {oneLetterDays.map((item, index) => (

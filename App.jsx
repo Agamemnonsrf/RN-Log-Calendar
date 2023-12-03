@@ -1,6 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { StyleSheet, Animated, View, Dimensions, Text } from "react-native";
+import {
+    StyleSheet,
+    Animated,
+    View,
+    Dimensions,
+    Pressable,
+    Text,
+    Button,
+} from "react-native";
 import Layout from "./Components/layout/layout";
 
 import FlatListRefContext from "./Components/context/flatListContext";
@@ -11,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //expo splashscreen
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient } from "expo-linear-gradient";
 import NoteInput from "./Components/calendar/NoteInput";
 
 const screenWidth = Dimensions.get("window").width;
@@ -22,12 +30,10 @@ export default function App() {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [theme, setTheme] = useState(colorThemes["defaultDark"]);
     const [appIsReady, setAppIsReady] = useState(false);
-    const [focused, setFocused] = useState(false);
     const position1 = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
     const sideMenuRef = useRef();
     const dayRef = useRef();
-    const focusPanRef = useRef(new Animated.Value(0)).current;
 
     const [fontsLoaded] = useFonts({
         "Poppins-Black": require("./assets/fonts/Poppins/Poppins-Black.ttf"),
@@ -70,8 +76,6 @@ export default function App() {
         }
     }, [appIsReady]);
 
-
-
     const selectNewMonth = (newMonth) => {
         let newMonthCall;
         setCurrentMonth((prev) => {
@@ -106,28 +110,9 @@ export default function App() {
         });
     };
 
-    const interpolateFocus = focusPanRef.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -screenWidth],
-    });
+    // ...existing code...
 
-    useEffect(() => {
-        if (focused) {
-
-            Animated.spring(focusPanRef, {
-                toValue: 1,
-                duration: 400,
-                useNativeDriver: false,
-            }).start();
-        } else {
-            Animated.spring(focusPanRef, {
-                toValue: 0,
-                duration: 400,
-                useNativeDriver: false,
-            }).start();
-        }
-    }, [focused])
-
+    // ...existing code...
 
     if (!appIsReady || !fontsLoaded) {
         return null;
@@ -147,45 +132,43 @@ export default function App() {
                 setTheme,
             }}
         >
-            <View
-                style={[
-                    styles.container,
-
-                ]}
-                onLayout={onLayoutRootView}
-            >
+            <View style={[styles.container]} onLayout={onLayoutRootView}>
                 <LinearGradient
                     colors={theme.backgroundGradient}
                     style={styles.background}
                     end={{ x: 1, y: 1 }}
                 />
+
                 <Layout>
                     <Animated.View
                         style={{
-                            transform: [{ translateX: position1, }],
+                            transform: [{ translateX: position1 }],
                             width: "100%",
-                            justifyContent: "space-between",
-                            height: "100%"
+                            height: "100%",
                         }}
                     >
-                        <Animated.View
+                        <View
                             style={{
-                                height: 50,
+                                height: "10%",
                                 width: "100%",
-                                right: interpolateFocus
                             }}
                         >
                             <BarsMenuIcon />
-                        </Animated.View>
-                        <CurrentMonth
-                            currentMonth={currentMonth}
-                            setCurrentYear={setCurrentYear}
-                            currentYear={currentYear}
-                            focused={focused}
-                        />
-                        {/* <View style={{ height: "37%" }}>
-                            <NoteInput ref={dropDownRef} focused={focused} setFocused={setFocused} />
-                        </View> */}
+                        </View>
+                        <View
+                            style={{
+                                height: "60%",
+                                width: "100%",
+                            }}
+                        >
+                            <CurrentMonth
+                                currentMonth={currentMonth}
+                                setCurrentYear={setCurrentYear}
+                                currentYear={currentYear}
+                            />
+                        </View>
+
+                        <NoteInput ref={dropDownRef} />
                     </Animated.View>
                 </Layout>
                 <StatusBar style="light" translucent={true} />
@@ -199,12 +182,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-    }, background: {
-        position: 'absolute',
+    },
+    background: {
+        position: "absolute",
         left: 0,
         right: 0,
         top: 0,
         height: "100%",
-
-    }
+    },
 });

@@ -28,7 +28,11 @@ export default SpinnerIcon = () => {
                 transform: [{ rotate: spin }],
             }}
         >
-            <EvilIcons name="spinner-2" size={24} color={theme.background} />
+            <EvilIcons
+                name="spinner-2"
+                size={24}
+                color={theme.primaryHighFade}
+            />
         </Animated.View>
     );
 };

@@ -17,13 +17,13 @@ export default SyncedIcon = () => {
         >
             <Text
                 style={{
-                    color: theme.background,
+                    color: theme.primaryHighFade,
                     fontFamily: "Poppins-Medium",
                 }}
             >
                 Synced{" "}
             </Text>
-            <Feather name="check" size={24} color={theme.background} />
+            <Feather name="check" size={24} color={theme.primaryHighFade} />
         </View>
     );
 };

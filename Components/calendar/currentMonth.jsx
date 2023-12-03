@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext } from "react";
+import React, { useEffect, useRef, useContext, memo } from "react";
 import {
     View,
     Text,
@@ -7,7 +7,6 @@ import {
     Dimensions,
     StyleSheet,
 } from "react-native";
-import { months } from "../data/data";
 import Day from "./day";
 import YearSelector from "./yearSelector";
 import Constants from "expo-constants";
@@ -18,31 +17,9 @@ const screenHeight =
 const screenWidth = Dimensions.get("window").width;
 const oneLetterDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export default CurrentMonth = ({
-    currentMonth,
-    setCurrentYear,
-    currentYear,
-    focused
-}) => {
+const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
     const { theme } = useContext(FlatListRefContext);
     const focusPanRef = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        if (focused) {
-
-            Animated.spring(focusPanRef, {
-                toValue: 1,
-                duration: 400,
-                useNativeDriver: false,
-            }).start();
-        } else {
-            Animated.spring(focusPanRef, {
-                toValue: 0,
-                duration: 400,
-                useNativeDriver: false,
-            }).start();
-        }
-    }, [focused])
 
     const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -120,91 +97,123 @@ export default CurrentMonth = ({
                 alignItems: "center",
                 width: "100%",
                 height: "100%",
+                justifyContent: "center",
             }}
         >
-
-            <Animated.View style={{ width: "100%", flexDirection: "row", alignItems: "baseline", borderBottomWidth: 1, borderBottomColor: theme.primaryHighFade, left: interpolateFocus }}>
+            <Animated.View
+                style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    alignItems: "baseline",
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.primaryHighFade,
+                }}
+            >
                 <Text
                     style={[
                         styles.bigText,
-                        { color: theme.primary, fontFamily: "Poppins-Regular", marginLeft: 15 },
+                        {
+                            color: theme.primary,
+                            fontFamily: "Poppins-Regular",
+                            marginLeft: 15,
+                        },
                     ]}
                 >
-                    {new Date(Date.UTC(currentYear, decideMonthForArray(currentMonth))).toLocaleDateString(undefined, { month: "long" })}
+                    {new Date(
+                        Date.UTC(currentYear, decideMonthForArray(currentMonth))
+                    ).toLocaleDateString(undefined, { month: "long" })}
                 </Text>
-                <Text style={{
-                    color: theme.primaryMidFade,
-                    fontFamily: "Poppins-Regular",
-                    marginLeft: 15,
-                    fontSize: 20
-                }}>
+                <Text
+                    style={{
+                        color: theme.primaryMidFade,
+                        fontFamily: "Poppins-Regular",
+                        marginLeft: 15,
+                        fontSize: 20,
+                    }}
+                >
                     {currentYear}
                 </Text>
             </Animated.View>
 
-            <FlatList
-                ListHeaderComponent={() => {
-                    return (
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "space-around",
-                                marginVertical: 10,
-                                borderRadius: 100,
-                                paddingVertical: 7,
-                                alignItems: "center",
-                            }}
-                        >
-                            {oneLetterDays.map((item, index) => (
-                                <Text
-                                    key={index}
-                                    style={{
-                                        color: theme.primary,
-                                        fontFamily: "Poppins-Light",
-                                    }}
-                                >
-                                    {item}
-                                </Text>
-                            ))}
-                        </View>
-                    );
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 10,
                 }}
-                renderItem={({ item }) => (
-                    <Day
-                        day={item.day}
-                        isCurrentMonth={item.month === currentMonth}
-                        month={item.month}
-                        year={item.year}
-                        isToday={
-                            item.day === new Date().getDate() &&
-                            item.month === new Date().getMonth() + 1 &&
-                            item.year === new Date().getFullYear()
-                        }
-                    />
-                )}
-                data={days}
-                keyExtractor={(item, index) =>
-                    new Date(
-                        item.year,
-                        item.month + 1,
-                        item.day
-                    ).toDateString() + index.toString()
-                }
-                numColumns={7}
-                style={{ flexGrow: 0 }}
-                contentContainerStyle={{
-                    justifyContent: "space-around",
-                }}
-                scrollEnabled={false}
-                getItemLayout={(data, index) => ({
-                    length: totalHeight,
-                    offset: totalHeight * index,
-                    index,
-                })}
-            />
+            >
+                <FlatList
+                    ListHeaderComponent={() => {
+                        return (
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    width: "100%",
+                                }}
+                            >
+                                {oneLetterDays.map((item, index) => (
+                                    <View
+                                        key={index}
+                                        style={{
+                                            flex: 1,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            width: screenWidth / 7,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: theme.primary,
+                                                fontFamily: "Poppins-Light",
+                                            }}
+                                        >
+                                            {item}
+                                        </Text>
+                                    </View>
+                                ))}
+                            </View>
+                        );
+                    }}
+                    renderItem={({ item }) => (
+                        <Day
+                            day={item.day}
+                            isCurrentMonth={item.month === currentMonth}
+                            month={item.month}
+                            year={item.year}
+                            isToday={
+                                item.day === new Date().getDate() &&
+                                item.month === new Date().getMonth() + 1 &&
+                                item.year === new Date().getFullYear()
+                            }
+                        />
+                    )}
+                    data={days}
+                    keyExtractor={(item, index) =>
+                        new Date(
+                            item.year,
+                            item.month + 1,
+                            item.day
+                        ).toDateString() + index.toString()
+                    }
+                    numColumns={7}
+                    style={{
+                        alignSelf: "center",
+                    }}
+                    contentContainerStyle={{}}
+                    scrollEnabled={false}
+                    getItemLayout={(data, index) => ({
+                        length: totalHeight,
+                        offset: totalHeight * index,
+                        index,
+                    })}
+                />
+            </View>
         </View>
     );
 };
+
+export default memo(CurrentMonth);
 
 const styles = StyleSheet.create({
     bigText: {

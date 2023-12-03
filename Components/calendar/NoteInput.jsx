@@ -23,21 +23,61 @@ import SyncedIcon from "./SyncedIcon";
 import Spinner from "./Spinner";
 import FlatListRefContext from "../context/flatListContext";
 
-const screenHeight =
-    Dimensions.get("window").height - Constants.statusBarHeight;
+const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-export default NoteInput = forwardRef(({ focused, setFocused }, ref) => {
-    const [date, setDate] = useState(new Date());
-    const [text, onChangeText] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [keyboardHeight, setKeyboardHeight] = useState(0);
+const textInputHeight = screenHeight * 0.3 * 0.95;
 
+export default NoteInput = forwardRef(({}, ref) => {
+    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
     const { theme } = useContext(FlatListRefContext);
 
+    const [date, setDate] = useState(new Date());
+    const [text, setText] = useState("");
+    const [loading, setLoading] = useState(false);
     const [selectedColor, setSelectedColor] = useState(theme.antithesis);
+    const [focused, setFocused] = useState(false);
 
-    const panRef = useRef(new Animated.Value(1)).current;
+    const getData = async () => {
+        try {
+            const value = await AsyncStorage.getItem(date.toDateString());
+            if (value !== null) {
+                return value;
+            } else return null;
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    useEffect(() => {
+        getData().then((value) => value && setText(value));
+    }, []);
+
+    const overlayHeight = useRef(new Animated.Value(0)).current;
+    const overlayOpacity = useRef(new Animated.Value(0)).current;
+    const focusPanRef = useRef(new Animated.Value(0)).current;
+    const textPanRef = useRef(new Animated.Value(0)).current;
+
+    const focusTextInput = (dir) => {
+        Animated.parallel([
+            Animated.timing(overlayHeight, {
+                toValue: dir,
+                duration: 300,
+                useNativeDriver: false,
+            }),
+            Animated.timing(overlayOpacity, {
+                toValue: dir,
+                duration: 300,
+                useNativeDriver: false,
+            }),
+            Animated.spring(focusPanRef, {
+                toValue: dir,
+                useNativeDriver: false,
+            }),
+        ]).start(() => {
+            setFocused(dir === 1 ? true : false);
+        });
+    };
 
     const setHasDataRef = useRef(null);
     const setColorRef = useRef(null);
@@ -54,73 +94,47 @@ export default NoteInput = forwardRef(({ focused, setFocused }, ref) => {
     ) => {
         setHasDataRef.current = setHasData;
         setColorRef.current = setColor;
-        textInputRef.current.focus();
         setDate(new Date(year, month - 1, day));
-        onChangeText(data);
-        setSelectedColor(color);
-        setFocused(true);
+        setText(data);
+        setSelectedColor(color ? color : theme.antithesis);
     };
 
     useImperativeHandle(ref, () => ({
         showDropdown,
     }));
 
-    useEffect(() => {
-        Animated.spring(panRef, {
-            toValue: focused ? 1 : 0,
-            useNativeDriver: false,
-        }).start();
-    }, [focused]);
+    const perf = (func) => {
+        const t0 = performance.now();
+        func();
+        const t1 = performance.now();
+        console.log(`Call to ${func.name} took ${t1 - t0}`);
+    };
 
-    const hideDelay = (delay) => {
-        setTimeout(() => {
-            hideDropdown();
-        }, delay);
+    const saveColor = async (date, color) => {
+        try {
+            await AsyncStorage.setItem(date.toDateString() + "color", color);
+        } catch (e) {
+        } finally {
+            setLoading(false);
+        }
     };
 
     const hideDropdown = () => {
-        setFocused(false);
         textInputRef.current.blur();
         if (setHasDataRef.current) {
             setHasDataRef.current(text);
         }
+        console.log("got here");
         if (setColorRef.current) {
             if (text.length > 0) {
-                if (!selectedColor.length > 0) {
-                    console.log("no color");
-                    setColorRef.current(theme.antithesis);
-                } else {
-                    console.log("color");
-                    setColorRef.current(selectedColor);
-                }
+                setColorRef.current(selectedColor);
+                saveColor(date, selectedColor);
             } else {
-                console.log("no text");
                 setColorRef.current("");
+                saveColor(date, "");
             }
         }
     };
-
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener(
-            "keyboardDidShow",
-            (e) => {
-                setKeyboardHeight(e.endCoordinates.height);
-            }
-        );
-
-        const keyboardDidHideListener = Keyboard.addListener(
-            "keyboardDidHide",
-            () => {
-                hideDropdown();
-                setKeyboardHeight(0); // Reset keyboard height when it hides
-            }
-        );
-
-        return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
-        };
-    }, []);
 
     const debounce = (func, delay) => {
         let timeoutId;
@@ -135,127 +149,161 @@ export default NoteInput = forwardRef(({ focused, setFocused }, ref) => {
             try {
                 await AsyncStorage.setItem(date.toDateString(), text);
                 setLoading(false); // Set loading to false after saving is complete
-            } catch (e) { }
+            } catch (e) {}
         }, 500)
     ).current;
 
     const handleTextChange = (text) => {
-        onChangeText(text);
+        setText(text);
         setLoading(true); // Set loading to true when text is changed
         debouncedSaveText(date, text); // Trigger debounced saveText function
     };
 
-    const interpolatePanX = panRef.interpolate({
+    const interpolatedHeight = overlayHeight.interpolate({
         inputRange: [0, 1],
-        outputRange: ["-500%", "0%"],
+        outputRange: ["0%", "100%"],
     });
 
-    const interpolatePanY = panRef.interpolate({
+    const interpolatedOpacity = overlayOpacity.interpolate({
         inputRange: [0, 1],
-        outputRange: [10, keyboardHeight],
+        outputRange: [0, 0.5],
+    });
+    const interpolateFocus = focusPanRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0%", "60%"],
+    });
+
+    const interpolatedTextOffset = textPanRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0%", "100%"],
     });
 
     return (
-        <Animated.View
-            style={[
-                styles.inputContainer,
-                {
-                    width: "95%",
-                    backgroundColor: "transparent",
-                    position: "absolute",
-                    alignSelf: "center",
-                    bottom: 0,
-                    marginBottom: 60
-                },
-            ]}
-        >
-            <View
+        <>
+            <Animated.View
                 style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    width: "100%",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    zIndex: 12,
+                    bottom: interpolateFocus,
+                    height: "100%",
                 }}
             >
                 <Animated.View
                     style={{
-                        zIndex: 6,
-                        backgroundColor: theme.primary,
-                        borderRadius: 100,
-                        paddingHorizontal: 5,
-                        margin: 5,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        top: 0,
-                        left: interpolatePanX,
+                        width: "95%",
                     }}
                 >
-                    <Text
+                    <View
                         style={{
-                            color: theme.background,
-                            fontFamily: "Poppins-Medium",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            width: "100%",
+                            position: "absolute",
+                            top: 0,
                         }}
                     >
-                        {date.toDateString()}
-                    </Text>
+                        <Animated.View
+                            style={{
+                                borderRadius: 100,
+                                paddingHorizontal: 5,
+                                margin: 5,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                top: 0,
+                                zIndex: 11,
+                                left: interpolatedTextOffset,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    color: theme.primaryHighFade,
+                                    fontFamily: "Poppins-Medium",
+                                }}
+                            >
+                                {date.toDateString()}
+                            </Text>
+                        </Animated.View>
+                        <Animated.View
+                            style={{
+                                zIndex: 6,
+                                borderRadius: 100,
+                                paddingHorizontal: 5,
+                                margin: 5,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                top: 0,
+                            }}
+                        >
+                            {loading ? <Spinner /> : <SyncedIcon />}
+                        </Animated.View>
+                    </View>
+                    <Pressable
+                        onPressIn={() => {
+                            focusTextInput(1);
+                        }}
+                    >
+                        <TextInput
+                            ref={textInputRef}
+                            editable={focused}
+                            multiline
+                            numberOfLines={8}
+                            maxLength={2000}
+                            onChangeText={(text) => handleTextChange(text)}
+                            value={text}
+                            style={[
+                                styles.textInput,
+                                {
+                                    height: textInputHeight,
+                                    width: "100%",
+                                    backgroundColor: focused
+                                        ? theme.background
+                                        : theme.quaternary,
+                                    color: focused
+                                        ? theme.primary
+                                        : theme.primaryHighFade,
+                                    textAlignVertical: "top",
+                                    fontSize: 18,
+                                    shadowColor: "black",
+                                    shadowOffset: {
+                                        width: 3,
+                                        height: 2,
+                                    },
+                                    shadowOpacity: 1,
+                                    shadowRadius: 3.84,
+                                    elevation: 5,
+                                },
+                            ]}
+                            placeholder={focused ? "Your notes here..." : ""}
+                            placeholderTextColor={theme.primaryHighFade}
+                        />
+                    </Pressable>
                 </Animated.View>
-                <Animated.View
-                    style={{
-                        zIndex: 6,
-                        backgroundColor: theme.primary,
-                        borderRadius: 100,
-                        paddingHorizontal: 5,
-                        margin: 5,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        top: 0,
-                        right: interpolatePanX,
-                    }}
-                >
-                    {loading ? <Spinner /> : <SyncedIcon />}
-                </Animated.View>
-            </View>
-            <TextInput
-                ref={textInputRef}
-                editable
-                multiline
-                numberOfLines={8}
-                maxLength={2000}
-                onChangeText={(text) => handleTextChange(text)}
-                value={text}
-                style={[
-                    styles.textInput,
-                    {
-                        height: "100%",
-                        width: "100%",
-                        backgroundColor: focused
-                            ? theme.tertiary
-                            : theme.quaternary,
-                        color: theme.primary,
-                        textAlignVertical: "top",
-                        alignSelf: "center",
-                        fontSize: 18,
-                    },
-                ]}
-                placeholder={focused ? "Your notes here..." : ""}
-                placeholderTextColor={theme.primaryHighFade}
-                onFocus={() => {
-                    setFocused(true);
-                }
-                }
-                onBlur={() => {
-                    setFocused(false);
+            </Animated.View>
+            <AnimatedPressable
+                style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 10,
+                    backgroundColor: "black",
+                    opacity: interpolatedOpacity,
+                    height: interpolatedHeight,
+                }}
+                onPress={() => {
+                    focusTextInput(0);
+                    hideDropdown();
                 }}
             />
-        </Animated.View>
+        </>
     );
 });
 
 const styles = StyleSheet.create({
     textInput: {
         padding: 10,
+        paddingTop: 25,
         borderRadius: 5,
-    },
-    inputContainer: {
-        zIndex: 6,
     },
 });

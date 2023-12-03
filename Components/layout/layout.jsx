@@ -18,10 +18,9 @@ const Layout = ({ children }) => {
     return (
         <View style={styles.container}>
             <SideMenu ref={sideMenuRef} />
-            <Dropdown ref={dropDownRef} />
+            {/* <Dropdown ref={dropDownRef} /> */}
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
-
             </View>
         </View>
     );

@@ -43,7 +43,7 @@ export default MonthSelector = ({
 
     const interpolatedTop = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, 200],
+        outputRange: [Constants.statusBarHeight, 50],
     });
 
     const interpolatedBackgroundColor = heightRef.interpolate({
@@ -53,12 +53,12 @@ export default MonthSelector = ({
 
     const interpolateParentHeight = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: ["0%", "100%"],
+        outputRange: [0, screenHeight],
     });
 
     const interpolateParentWidth = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: ["0%", "100%"],
+        outputRange: [0, screenWidth],
     });
 
     const showMenu = (dir) => {
@@ -69,80 +69,97 @@ export default MonthSelector = ({
     };
 
     return (
-        <>
+        <View
+            style={{
+                width: "100%",
+                height: "100%",
+                flex: 1,
+                zIndex: 50,
+            }}
+        >
             <AnimatedPressable
                 style={{
-                    width: interpolateParentWidth,
-                    height: interpolateParentHeight,
                     backgroundColor: "rgba(0, 0, 0, 0.5)",
                     position: "absolute",
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    zIndex: 99,
+                    height: interpolateParentHeight,
+                    width: interpolateParentWidth,
+                    zIndex: 50,
                 }}
                 onPress={() => showMenu(0)}
             ></AnimatedPressable>
 
-            <AnimatedFlatlist
-                scrollEnabled={true}
-                ref={flatListRef}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
+            <Animated.View
                 style={{
                     height: interpolatedHeight,
                     backgroundColor: interpolatedBackgroundColor,
                     borderRadius: 10,
-                    transform: [{ translateY: interpolatedTop }],
-                    marginBottom: 10,
                     left: 0,
-                    zIndex: 100,
-                }}
-                data={[
-                    "January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December",
-                ]}
-                keyExtractor={(item, index) => item + index}
-                contentContainerStyle={{
+                    bottom: 0,
                     alignItems: "center",
                     justifyContent: "center",
+                    top: interpolatedTop,
+                    zIndex: 51,
                 }}
-                //initialScrollIndex={currentMonth - 1}
-                renderItem={({ item }) => {
-                    return (
-                        <Pressable
-                            onPress={() => {
-                                showMenu(1);
-                                console.log("pressed");
-                            }}
-                            style={{}}
-                        >
-                            <Text
-                                style={[
-                                    {
-                                        color: theme.primary,
-                                        fontFamily: "Poppins-Regular",
-                                        fontSize: 34,
-                                    },
-                                ]}
+            >
+                <FlatList
+                    scrollEnabled={true}
+                    ref={flatListRef}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    style={{
+                        height: "100%",
+                        width: "100%",
+                    }}
+                    data={[
+                        "January",
+                        "February",
+                        "March",
+                        "April",
+                        "May",
+                        "June",
+                        "July",
+                        "August",
+                        "September",
+                        "October",
+                        "November",
+                        "December",
+                    ]}
+                    keyExtractor={(item, index) => item + index}
+                    contentContainerStyle={{}}
+                    //initialScrollIndex={currentMonth - 1}
+                    renderItem={({ item }) => {
+                        return (
+                            <Pressable
+                                onPress={() => {
+                                    showMenu(1);
+                                    console.log("pressed");
+                                }}
+                                style={{
+                                    width: "100%",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
                             >
-                                {item}
-                            </Text>
-                        </Pressable>
-                    );
-                }}
-            />
-        </>
+                                <Text
+                                    style={[
+                                        {
+                                            color: theme.primary,
+                                            fontFamily: "Poppins-Regular",
+                                            fontSize: 34,
+                                        },
+                                    ]}
+                                >
+                                    {item}
+                                </Text>
+                            </Pressable>
+                        );
+                    }}
+                />
+            </Animated.View>
+        </View>
     );
 };
 {

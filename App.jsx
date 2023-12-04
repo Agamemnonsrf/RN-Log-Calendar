@@ -146,7 +146,7 @@ export default function App() {
                     >
                         <View
                             style={{
-                                height: "15%",
+                                height: "10%",
                                 width: "100%",
                                 flexDirection: "row",
                                 alignItems: "flex-end",
@@ -156,13 +156,20 @@ export default function App() {
                                 borderBottomColor: theme.primaryHighFade,
                             }}
                         >
+                            <BarsMenuIcon />
+                        </View>
+                        <View
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                position: "absolute",
+                            }}
+                        >
                             <MonthSelector
                                 currentYear={currentYear}
                                 currentMonth={currentMonth}
                             />
-                            <BarsMenuIcon />
                         </View>
-
                         <View
                             style={{
                                 height: "55%",

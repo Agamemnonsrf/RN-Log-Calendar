@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, memo } from "react";
+import React, { useEffect, useRef, useContext, memo, useState } from "react";
 import {
     View,
     Text,
@@ -101,18 +101,6 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
                 justifyContent: "flex-start",
             }}
         >
-            <Text
-                style={{
-                    color: theme.primaryMidFade,
-                    fontFamily: "Poppins-Regular",
-                    right: 10,
-                    fontSize: 20,
-                    position: "absolute",
-                }}
-            >
-                {currentYear}
-            </Text>
-
             <View
                 style={{
                     flex: 1,

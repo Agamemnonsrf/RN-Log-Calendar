@@ -19,7 +19,7 @@ const colorThemes = {
         name: "defaultDark",
         overall: "dark",
         background: "#333240",
-        backgroundGradient: ["#414857", "#2B303A"],
+        backgroundGradient: ["#4C4C4C", "#323232"],
         primary: "white",
         antithesis: "white",
         primaryLowFade: "rgba(255,255,255,0.9)",
@@ -29,7 +29,7 @@ const colorThemes = {
         secondary: "#2F87FF",
         secondaryVibrant: "#009DFF",
         tertiary: "#62666e",
-        quaternary: "#464855",
+        quaternary: "#4C4C4C",
         quinary: "#2c3e5066",
     },
     autumnLight: {

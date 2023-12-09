@@ -18,7 +18,7 @@ const windowHeight =
 const containerWidth = windowWidth / 7 - 5;
 const containerHeight = windowHeight / 12.5;
 
-export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
+const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
     const { dropDownRef, theme } = useContext(FlatListRefContext);
     const [hasData, setHasData] = useState("");
     const [color, setColor] = useState("");
@@ -65,7 +65,7 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     alignItems: "center",
                 },
             ]}
-            onPress={() =>
+            onPress={() => {
                 dropDownRef.current.showDropdown(
                     year,
                     month,
@@ -74,8 +74,8 @@ export const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     setHasData,
                     setColor,
                     color
-                )
-            }
+                );
+            }}
         >
             <View
                 style={{

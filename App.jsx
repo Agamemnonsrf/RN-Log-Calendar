@@ -136,9 +136,8 @@ export default function App() {
                 />
 
                 <Layout>
-                    <Animated.View
+                    <View
                         style={{
-                            transform: [{ translateX: position1 }],
                             width: "100%",
                             height: "100%",
                             alignItems: "center",
@@ -146,7 +145,7 @@ export default function App() {
                     >
                         <View
                             style={{
-                                height: "10%",
+                                height: "15%",
                                 width: "100%",
                                 flexDirection: "row",
                                 alignItems: "flex-end",
@@ -158,22 +157,18 @@ export default function App() {
                         >
                             <BarsMenuIcon />
                         </View>
-                        <View
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                position: "absolute",
-                            }}
-                        >
-                            <MonthSelector
-                                currentYear={currentYear}
-                                currentMonth={currentMonth}
-                            />
-                        </View>
-                        <View
+
+                        <MonthSelector
+                            currentYear={currentYear}
+                            currentMonth={currentMonth}
+                            selectNewMonth={selectNewMonth}
+                        />
+
+                        <Animated.View
                             style={{
                                 height: "55%",
                                 width: "100%",
+                                transform: [{ translateX: position1 }],
                             }}
                         >
                             <CurrentMonth
@@ -181,10 +176,10 @@ export default function App() {
                                 setCurrentYear={setCurrentYear}
                                 currentYear={currentYear}
                             />
-                        </View>
+                        </Animated.View>
 
                         <NoteInput ref={dropDownRef} />
-                    </Animated.View>
+                    </View>
                 </Layout>
                 <StatusBar style="light" translucent={true} />
             </View>

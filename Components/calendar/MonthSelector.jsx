@@ -13,37 +13,49 @@ import Day from "./day";
 import YearSelector from "./yearSelector";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
+import { render } from "react-dom";
 
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
 const screenWidth = Dimensions.get("window").width;
 
+const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
 export default MonthSelector = ({
     currentYear,
     currentMonth,
     decideMonthForArray,
+    selectNewMonth,
 }) => {
     const { theme } = useContext(FlatListRefContext);
     const heightRef = useRef(new Animated.Value(0)).current;
     const flatListRef = useRef();
-    const [showingMenu, setShowingMenu] = useState(false);
-
-    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-    const AnimatedFlatlist = Animated.createAnimatedComponent(FlatList);
+    const [showingMenu, setShowingMenu] = useState({ state: false, month: 0 });
 
     const interpolatedHeight = heightRef.interpolate({
         inputRange: [0, 1],
         outputRange: [50, 200],
     });
 
-    const interpolatedWidth = heightRef.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0%", "70%"],
-    });
-
     const interpolatedTop = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [Constants.statusBarHeight, 50],
+        outputRange: [
+            Constants.statusBarHeight * 2,
+            Constants.statusBarHeight * 2 + 20,
+        ],
     });
 
     const interpolatedBackgroundColor = heightRef.interpolate({
@@ -51,46 +63,84 @@ export default MonthSelector = ({
         outputRange: ["rgba(50, 50, 50, 0)", "rgba(50, 50, 50, 1)"],
     });
 
-    const interpolateParentHeight = heightRef.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, screenHeight],
-    });
+    const renderItem = ({ item }) => {
+        return (
+            <Pressable
+                onPress={() => {
+                    setShowingMenu((prev) => {
+                        return { state: !prev.state, month: item };
+                    });
+                }}
+                style={{
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 50,
+                    marginBottom: 10,
+                }}
+            >
+                <Text
+                    style={[
+                        {
+                            color: theme.primary,
+                            fontFamily: "Poppins-Regular",
+                            fontSize: 34,
+                        },
+                    ]}
+                >
+                    {item}
+                </Text>
+            </Pressable>
+        );
+    };
 
-    const interpolateParentWidth = heightRef.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, screenWidth],
-    });
+    const firstRender = useRef(true);
 
-    const showMenu = (dir) => {
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+        } else {
+            console.log(showingMenu.state);
+            if (showingMenu.state) {
+                console.log("show");
+                showMenu();
+            } else {
+                hideMenu(months.indexOf(showingMenu.month));
+            }
+        }
+    }, [showingMenu]);
+
+    const showMenu = () => {
         Animated.spring(heightRef, {
-            toValue: dir,
+            toValue: 1,
             useNativeDriver: false,
         }).start();
     };
 
+    const hideMenu = (month = 0) => {
+        Animated.parallel([
+            Animated.spring(heightRef, {
+                toValue: 0,
+                useNativeDriver: false,
+            }),
+            flatListRef.current.scrollToIndex({
+                index: month,
+                animated: true,
+            }),
+        ]).start(() => {
+            selectNewMonth(month + 1);
+        });
+    };
+
     return (
-        <View
+        <Animated.View
             style={{
-                width: "100%",
-                height: "100%",
-                flex: 1,
-                zIndex: 50,
+                width: "90%",
+                height: interpolatedHeight,
+                position: "absolute",
+                zIndex: 10,
             }}
         >
-            <AnimatedPressable
-                style={{
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: interpolateParentHeight,
-                    width: interpolateParentWidth,
-                    zIndex: 50,
-                }}
-                onPress={() => showMenu(0)}
-            ></AnimatedPressable>
-
             <Animated.View
                 style={{
                     height: interpolatedHeight,
@@ -105,7 +155,7 @@ export default MonthSelector = ({
                 }}
             >
                 <FlatList
-                    scrollEnabled={true}
+                    scrollEnabled={showingMenu.state}
                     ref={flatListRef}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -113,53 +163,20 @@ export default MonthSelector = ({
                         height: "100%",
                         width: "100%",
                     }}
-                    data={[
-                        "January",
-                        "February",
-                        "March",
-                        "April",
-                        "May",
-                        "June",
-                        "July",
-                        "August",
-                        "September",
-                        "October",
-                        "November",
-                        "December",
-                    ]}
+                    getItemLayout={(data, index) => {
+                        return { length: 60, offset: 60 * index, index };
+                    }}
+                    data={months}
                     keyExtractor={(item, index) => item + index}
                     contentContainerStyle={{}}
-                    //initialScrollIndex={currentMonth - 1}
-                    renderItem={({ item }) => {
-                        return (
-                            <Pressable
-                                onPress={() => {
-                                    showMenu(1);
-                                    console.log("pressed");
-                                }}
-                                style={{
-                                    width: "100%",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Text
-                                    style={[
-                                        {
-                                            color: theme.primary,
-                                            fontFamily: "Poppins-Regular",
-                                            fontSize: 34,
-                                        },
-                                    ]}
-                                >
-                                    {item}
-                                </Text>
-                            </Pressable>
-                        );
+                    initialScrollIndex={currentMonth - 1}
+                    renderItem={renderItem}
+                    ListFooterComponent={() => {
+                        return <View style={{ height: 100 }} />;
                     }}
                 />
             </Animated.View>
-        </View>
+        </Animated.View>
     );
 };
 {

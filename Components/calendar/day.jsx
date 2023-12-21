@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import FlatListRefContext from "../context/flatListContext";
 import {
     Dimensions,
@@ -6,6 +6,8 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
+    ScrollView,
+    Animated,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -18,10 +20,41 @@ const windowHeight =
 const containerWidth = windowWidth / 7 - 5;
 const containerHeight = windowHeight / 12.5;
 
+const coolors = [
+    "#FF6633",
+    "#FFB399",
+    "#FF33FF",
+    "#FFFF99",
+    "#00B3E6",
+    "#E6B333",
+    "#3366E6",
+    "#999966",
+    "#99FF99",
+    "#B34D4D",
+];
+
 const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
     const { dropDownRef, theme } = useContext(FlatListRefContext);
     const [hasData, setHasData] = useState("");
     const [color, setColor] = useState("");
+
+    const AnimatedTouchableOpacity =
+        Animated.createAnimatedComponent(TouchableOpacity);
+    const colorSelectorRef = useRef(new Animated.Value(0)).current;
+
+    const showColorSelector = () => {
+        Animated.spring(colorSelectorRef, {
+            toValue: 1,
+            useNativeDriver: false,
+        }).start();
+    };
+
+    const hideColorSelector = () => {
+        Animated.spring(colorSelectorRef, {
+            toValue: 0,
+            useNativeDriver: false,
+        }).start();
+    };
 
     const getColor = async () => {
         try {
@@ -54,58 +87,139 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
         getData().then((value) => value && setHasData(value));
     }, []);
 
+    const interpolatedColorSelectorWidth = colorSelectorRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 150],
+    });
+
+    const interpolatedColorSelectorHeight = colorSelectorRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 40],
+    });
+
+    const interpolatedColorWidth = colorSelectorRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 25],
+    });
+
+    const interpolatedColorHeight = colorSelectorRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 25],
+    });
+
+    const interpolatedColorSelectorPosition = colorSelectorRef.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0%", "-50%"],
+    });
+
     return (
-        <TouchableOpacity
-            style={[
-                {
-                    width: windowWidth / 7,
-                    height: containerHeight,
-                    borderRadius: 100,
-                    justifyContent: "center",
-                    alignItems: "center",
-                },
-            ]}
-            onPress={() => {
-                dropDownRef.current.showDropdown(
-                    year,
-                    month,
-                    day,
-                    hasData || "",
-                    setHasData,
-                    setColor,
-                    color
-                );
-            }}
-        >
+        <>
             <View
-                style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 30,
-                    height: 30,
-                }}
+                style={[
+                    {
+                        width: windowWidth / 7,
+                        height: containerHeight,
+                        justifyContent: "center",
+                        alignItems: "center",
+                    },
+                ]}
             >
-                <View style={{ position: "absolute", top: "-20%" }}>
-                    {isToday && (
-                        <MaterialIcons
-                            name="today"
-                            size={12}
-                            color={theme.primary}
-                        />
-                    )}
-                </View>
-                <Text
+                {hasData && (
+                    <Animated.View
+                        style={{
+                            height: interpolatedColorSelectorHeight,
+                            width: interpolatedColorSelectorWidth,
+                            borderRadius: 100,
+                            backgroundColor: theme.background,
+                            position: "absolute",
+                            top: interpolatedColorSelectorPosition,
+                            zIndex: 10,
+                            overflow: "hidden",
+                            flexDirection: "row",
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
+                        }}
+                    >
+                        <ScrollView
+                            horizontal
+                            contentContainerStyle={{
+                                justifyContent: "space-around",
+                                gap: 10,
+                                paddingHorizontal: 10,
+                            }}
+                        >
+                            {coolors.map((coolor) => (
+                                <AnimatedTouchableOpacity
+                                    key={coolor}
+                                    style={{
+                                        width: interpolatedColorWidth,
+                                        height: interpolatedColorHeight,
+                                        borderRadius: 100,
+                                        backgroundColor: coolor,
+                                    }}
+                                    onPress={() => {
+                                        setColor(coolor);
+                                        hideColorSelector();
+                                    }}
+                                />
+                            ))}
+                        </ScrollView>
+                    </Animated.View>
+                )}
+                <TouchableOpacity
                     style={{
-                        color: isCurrentMonth
-                            ? theme.primary
-                            : theme.primaryHighFade,
-                        fontSize: containerHeight / 3.5,
-                        fontFamily: "Poppins-Light",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: 30,
+                        height: 30,
+                        backgroundColor: color ? color : "transparent",
+                        borderRadius: 5,
+                        overflow: "hidden",
                     }}
+                    onPress={() => {
+                        dropDownRef.current.showDropdown(
+                            year,
+                            month,
+                            day,
+                            hasData || "",
+                            setHasData,
+                            setColor,
+                            color
+                        );
+                    }}
+                    onLongPress={() => showColorSelector()}
                 >
-                    {day}
-                </Text>
-                <View
+                    {isToday && (
+                        <View
+                            style={{
+                                position: "absolute",
+                                bottom: 0,
+                                zIndex: 10,
+                            }}
+                        >
+                            <MaterialIcons
+                                name="today"
+                                size={10}
+                                color={color ? "black" : theme.primary}
+                            />
+                        </View>
+                    )}
+                    <Text
+                        style={{
+                            color: isCurrentMonth
+                                ? color
+                                    ? "black"
+                                    : theme.primary
+                                : theme.primaryHighFade,
+                            fontSize: containerHeight / 3.5,
+                            fontFamily: "Poppins-Light",
+                            padding: 0,
+                            margin: 0,
+                        }}
+                    >
+                        {day}
+                    </Text>
+                    {/* <View
                     style={{
                         borderRadius: 100,
                         width: containerWidth * 0.5,
@@ -114,9 +228,10 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                         bottom: 0,
                         position: "absolute",
                     }}
-                />
+                /> */}
+                </TouchableOpacity>
             </View>
-        </TouchableOpacity>
+        </>
     );
 };
 

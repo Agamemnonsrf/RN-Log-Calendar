@@ -8,6 +8,7 @@ import {
     Pressable,
     Text,
     Button,
+    StatusBar as RNStatusBar
 } from "react-native";
 import Layout from "./Components/layout/layout";
 
@@ -21,6 +22,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import NoteInput from "./Components/calendar/NoteInput";
+import SideMenu from "./Components/layout/SideMenu";
+import MonthSelector from "./Components/calendar/MonthSelector";
 
 const screenWidth = Dimensions.get("window").width;
 SplashScreen.preventAutoHideAsync();
@@ -135,52 +138,51 @@ export default function App() {
                     end={{ x: 1, y: 1 }}
                 />
 
-                <Layout>
-                    <View
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            alignItems: "center",
-                        }}
-                    >
-                        <View
-                            style={{
-                                height: "15%",
-                                width: "100%",
-                                flexDirection: "row",
-                                alignItems: "flex-end",
-                                justifyContent: "space-between",
-                                zIndex: 10,
-                                borderBottomWidth: 1,
-                                borderBottomColor: theme.primaryHighFade,
-                            }}
-                        >
-                            <BarsMenuIcon />
-                        </View>
-
-                        <MonthSelector
-                            currentYear={currentYear}
-                            currentMonth={currentMonth}
-                            selectNewMonth={selectNewMonth}
-                        />
-
-                        <Animated.View
-                            style={{
-                                height: "55%",
-                                width: "100%",
-                                transform: [{ translateX: position1 }],
-                            }}
-                        >
-                            <CurrentMonth
-                                currentMonth={currentMonth}
-                                setCurrentYear={setCurrentYear}
-                                currentYear={currentYear}
-                            />
-                        </Animated.View>
-
-                        <NoteInput ref={dropDownRef} />
+                {/* <SideMenu ref={sideMenuRef} /> */}
+                <View
+                    style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 10,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 10,
+                        borderBottomWidth: 1,
+                        borderBottomColor: theme.primaryHighFade,
+                    }}
+                >
+                    <View style={{
+                        position: "absolute",
+                        left: 10,
+                        bottom: 13.5
+                    }}>
+                        <BarsMenuIcon />
                     </View>
-                </Layout>
+                    <MonthSelector
+                        currentYear={currentYear}
+                        currentMonth={currentMonth}
+                        selectNewMonth={selectNewMonth}
+                    />
+                </View>
+
+                <Animated.View
+                    style={{
+                        transform: [{ translateX: position1 }],
+                    }}
+                >
+                    <CurrentMonth
+                        currentMonth={currentMonth}
+                        setCurrentYear={setCurrentYear}
+                        currentYear={currentYear}
+                    />
+                </Animated.View>
+                <View style={{
+                    flex: 1,
+                    justifyContent: "center",
+
+                }}>
+                    <NoteInput ref={dropDownRef} />
+                </View>
                 <StatusBar style="light" translucent={true} />
             </View>
         </FlatListRefContext.Provider>
@@ -190,14 +192,13 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
+        paddingTop: RNStatusBar.currentHeight + 10
     },
     background: {
         position: "absolute",
         left: 0,
         right: 0,
         top: 0,
-        height: "100%",
+        height: "120%",
     },
 });

@@ -17,7 +17,7 @@ const Layout = ({ children }) => {
 
     return (
         <View style={styles.container}>
-            <SideMenu ref={sideMenuRef} />
+            
             {/* <Dropdown ref={dropDownRef} /> */}
             <View style={styles.sidebar}>
                 <View style={styles.childrenContainer}>{children}</View>
@@ -30,8 +30,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "column",
-        width: "100%",
-        height: "100%",
     },
 
     appSquare: {

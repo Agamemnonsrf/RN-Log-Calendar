@@ -12,9 +12,6 @@ export default BarsMenuIcon = () => {
             style={{
                 justifyContent: "center",
                 alignItems: "center",
-                right: 10,
-                position: "absolute",
-                bottom: 10,
             }}
             onPress={() => sideMenuRef.current.showMenu()}
         >

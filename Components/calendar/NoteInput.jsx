@@ -26,9 +26,9 @@ import FlatListRefContext from "../context/flatListContext";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-const textInputHeight = screenHeight * 0.3 * 0.95;
+const textInputHeight = screenHeight * 0.3
 
-export default NoteInput = forwardRef(({}, ref) => {
+export default NoteInput = forwardRef(({ }, ref) => {
     const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
     const { theme } = useContext(FlatListRefContext);
 
@@ -149,7 +149,7 @@ export default NoteInput = forwardRef(({}, ref) => {
             try {
                 await AsyncStorage.setItem(date.toDateString(), text);
                 setLoading(false); // Set loading to false after saving is complete
-            } catch (e) {}
+            } catch (e) { }
         }, 500)
     ).current;
 
@@ -161,7 +161,7 @@ export default NoteInput = forwardRef(({}, ref) => {
 
     const interpolatedHeight = overlayHeight.interpolate({
         inputRange: [0, 1],
-        outputRange: ["0%", "100%"],
+        outputRange: ["100%", "100%"],
     });
 
     const interpolatedOpacity = overlayOpacity.interpolate({
@@ -182,103 +182,92 @@ export default NoteInput = forwardRef(({}, ref) => {
         <>
             <Animated.View
                 style={{
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    zIndex: 13,
-                    bottom: interpolateFocus,
-                    width: "100%",
+                    width: "95%",
                 }}
             >
-                <Animated.View
+                <View
                     style={{
-                        width: "95%",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        position: "absolute",
+                        top: 0,
                     }}
                 >
-                    <View
+                    <Animated.View
                         style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            width: "100%",
-                            position: "absolute",
+                            borderRadius: 100,
+                            paddingHorizontal: 5,
+                            margin: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            top: 0,
+                            zIndex: 11,
+                            left: interpolatedTextOffset,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                color: theme.primaryHighFade,
+                                fontFamily: "Poppins-Medium",
+                            }}
+                        >
+                            {date.toDateString()}
+                        </Text>
+                    </Animated.View>
+                    <Animated.View
+                        style={{
+                            zIndex: 6,
+                            borderRadius: 100,
+                            paddingHorizontal: 5,
+                            margin: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
                             top: 0,
                         }}
                     >
-                        <Animated.View
-                            style={{
-                                borderRadius: 100,
-                                paddingHorizontal: 5,
-                                margin: 5,
-                                justifyContent: "center",
-                                alignItems: "center",
-                                top: 0,
-                                zIndex: 11,
-                                left: interpolatedTextOffset,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    color: theme.primaryHighFade,
-                                    fontFamily: "Poppins-Medium",
-                                }}
-                            >
-                                {date.toDateString()}
-                            </Text>
-                        </Animated.View>
-                        <Animated.View
-                            style={{
-                                zIndex: 6,
-                                borderRadius: 100,
-                                paddingHorizontal: 5,
-                                margin: 5,
-                                justifyContent: "center",
-                                alignItems: "center",
-                                top: 0,
-                            }}
-                        >
-                            {loading ? <Spinner /> : <SyncedIcon />}
-                        </Animated.View>
-                    </View>
-                    <Pressable
-                        onPressIn={() => {
-                            focusTextInput(1);
-                        }}
-                    >
-                        <TextInput
-                            ref={textInputRef}
-                            editable={focused}
-                            multiline
-                            numberOfLines={8}
-                            maxLength={2000}
-                            onChangeText={(text) => handleTextChange(text)}
-                            value={text}
-                            style={[
-                                styles.textInput,
-                                {
-                                    height: textInputHeight,
-                                    width: "100%",
-                                    backgroundColor: focused
-                                        ? theme.background
-                                        : theme.quaternary,
-                                    color: focused
-                                        ? theme.primary
-                                        : theme.primaryHighFade,
-                                    textAlignVertical: "top",
-                                    fontSize: 18,
-                                    shadowColor: "black",
-                                    shadowOffset: {
-                                        width: 3,
-                                        height: 2,
-                                    },
-                                    shadowOpacity: 1,
-                                    shadowRadius: 3.84,
-                                    elevation: 5,
+                        {loading ? <Spinner /> : <SyncedIcon />}
+                    </Animated.View>
+                </View>
+                <Pressable
+                    onPressIn={() => {
+                        focusTextInput(1);
+                    }}
+                >
+                    <TextInput
+                        ref={textInputRef}
+                        editable={focused}
+                        multiline
+                        numberOfLines={8}
+                        maxLength={2000}
+                        onChangeText={(text) => handleTextChange(text)}
+                        value={text}
+                        style={[
+                            styles.textInput,
+                            {
+                                width: "100%",
+                                backgroundColor: focused
+                                    ? theme.background
+                                    : theme.quaternary,
+                                color: focused
+                                    ? theme.primary
+                                    : theme.primaryHighFade,
+                                textAlignVertical: "top",
+                                fontSize: 18,
+                                shadowColor: "black",
+                                shadowOffset: {
+                                    width: 3,
+                                    height: 2,
                                 },
-                            ]}
-                            placeholder={focused ? "Your notes here..." : ""}
-                            placeholderTextColor={theme.primaryHighFade}
-                        />
-                    </Pressable>
-                </Animated.View>
+                                shadowOpacity: 1,
+                                shadowRadius: 3.84,
+                                elevation: 5,
+                            },
+                        ]}
+                        placeholder={focused ? "Your notes here..." : ""}
+                        placeholderTextColor={theme.primaryHighFade}
+                    />
+                </Pressable>
             </Animated.View>
             <AnimatedPressable
                 style={{

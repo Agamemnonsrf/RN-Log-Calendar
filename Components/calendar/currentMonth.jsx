@@ -93,90 +93,74 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
     });
 
     return (
-        <View
-            style={{
-                width: "100%",
-                height: "100%",
-                alignItems: "center",
-                justifyContent: "flex-start",
-            }}
-        >
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: 10,
-                }}
-            >
-                <FlatList
-                    ListHeaderComponent={() => {
-                        return (
+
+        <FlatList
+            ListHeaderComponent={() => {
+                return (
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            width: "100%",
+                            zIndex: -10,
+                        }}
+                    >
+                        {oneLetterDays.map((item, index) => (
                             <View
+                                key={index}
                                 style={{
-                                    flexDirection: "row",
-                                    width: "100%",
-                                    zIndex: -10,
+                                    flex: 1,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: screenWidth / 7,
                                 }}
                             >
-                                {oneLetterDays.map((item, index) => (
-                                    <View
-                                        key={index}
-                                        style={{
-                                            flex: 1,
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            width: screenWidth / 7,
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                color: theme.primary,
-                                                fontFamily: "Poppins-Light",
-                                            }}
-                                        >
-                                            {item}
-                                        </Text>
-                                    </View>
-                                ))}
+                                <Text
+                                    style={{
+                                        color: theme.primary,
+                                        fontFamily: "Poppins-Light",
+                                    }}
+                                >
+                                    {item}
+                                </Text>
                             </View>
-                        );
-                    }}
-                    renderItem={({ item }) => (
-                        <Day
-                            day={item.day}
-                            isCurrentMonth={item.month === currentMonth}
-                            month={item.month}
-                            year={item.year}
-                            isToday={
-                                item.day === new Date().getDate() &&
-                                item.month === new Date().getMonth() + 1 &&
-                                item.year === new Date().getFullYear()
-                            }
-                        />
-                    )}
-                    data={days}
-                    keyExtractor={(item, index) =>
-                        new Date(
-                            item.year,
-                            item.month + 1,
-                            item.day
-                        ).toDateString() + index.toString()
+                        ))}
+                    </View>
+                );
+            }}
+            renderItem={({ item }) => (
+                <Day
+                    day={item.day}
+                    isCurrentMonth={item.month === currentMonth}
+                    month={item.month}
+                    year={item.year}
+                    isToday={
+                        item.day === new Date().getDate() &&
+                        item.month === new Date().getMonth() + 1 &&
+                        item.year === new Date().getFullYear()
                     }
-                    numColumns={7}
-                    style={{
-                        alignSelf: "center",
-                    }}
-                    contentContainerStyle={{}}
-                    scrollEnabled={false}
-                    getItemLayout={(data, index) => ({
-                        length: totalHeight,
-                        offset: totalHeight * index,
-                        index,
-                    })}
                 />
-            </View>
-        </View>
+            )}
+            data={days}
+            keyExtractor={(item, index) =>
+                new Date(
+                    item.year,
+                    item.month + 1,
+                    item.day
+                ).toDateString() + index.toString()
+            }
+            numColumns={7}
+            style={{
+                alignSelf: "center",
+            }}
+            contentContainerStyle={{}}
+            scrollEnabled={false}
+            getItemLayout={(data, index) => ({
+                length: totalHeight,
+                offset: totalHeight * index,
+                index,
+            })}
+        />
+
     );
 };
 

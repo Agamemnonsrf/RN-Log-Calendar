@@ -7,7 +7,7 @@ import {
     Dimensions,
     StyleSheet,
     PanResponder,
-    Pressable,
+    Pressable, StatusBar as RNStatusBar
 } from "react-native";
 import Day from "./day";
 import YearSelector from "./yearSelector";
@@ -53,8 +53,8 @@ export default MonthSelector = ({
     const interpolatedTop = heightRef.interpolate({
         inputRange: [0, 1],
         outputRange: [
-            Constants.statusBarHeight * 2,
-            Constants.statusBarHeight * 2 + 20,
+            RNStatusBar.currentHeight,
+            RNStatusBar.currentHeight * 2,
         ],
     });
 
@@ -115,6 +115,11 @@ export default MonthSelector = ({
             toValue: 1,
             useNativeDriver: false,
         }).start();
+        // flatListRef.current.scrollToIndex({
+        //     index: months.indexOf(showingMenu.month) - 2,
+        //     animated: true,
+        // });
+        flatListRef.current.scroll
     };
 
     const hideMenu = (month = 0) => {
@@ -127,56 +132,44 @@ export default MonthSelector = ({
                 index: month,
                 animated: true,
             }),
-        ]).start(() => {
+        ]).start();
+        setTimeout(() => {
             selectNewMonth(month + 1);
-        });
+        }, 300)
+
     };
 
     return (
         <Animated.View
             style={{
-                width: "90%",
                 height: interpolatedHeight,
-                position: "absolute",
-                zIndex: 10,
+                backgroundColor: interpolatedBackgroundColor,
+                borderRadius: 10,
+                zIndex: 51,
+                width: "70%",
+                borderWIdth: 2,
+                borderColor: 'green'
             }}
         >
-            <Animated.View
-                style={{
-                    height: interpolatedHeight,
-                    backgroundColor: interpolatedBackgroundColor,
-                    borderRadius: 10,
-                    left: 0,
-                    bottom: 0,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    top: interpolatedTop,
-                    zIndex: 51,
+            <FlatList
+                scrollEnabled={showingMenu.state}
+                ref={flatListRef}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                getItemLayout={(data, index) => {
+                    return { length: 60, offset: 60 * index, index };
                 }}
-            >
-                <FlatList
-                    scrollEnabled={showingMenu.state}
-                    ref={flatListRef}
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
-                    style={{
-                        height: "100%",
-                        width: "100%",
-                    }}
-                    getItemLayout={(data, index) => {
-                        return { length: 60, offset: 60 * index, index };
-                    }}
-                    data={months}
-                    keyExtractor={(item, index) => item + index}
-                    contentContainerStyle={{}}
-                    initialScrollIndex={currentMonth - 1}
-                    renderItem={renderItem}
-                    ListFooterComponent={() => {
-                        return <View style={{ height: 100 }} />;
-                    }}
-                />
-            </Animated.View>
+                data={months}
+                keyExtractor={(item, index) => item + index}
+                contentContainerStyle={{}}
+                initialScrollIndex={currentMonth - 1}
+                renderItem={renderItem}
+                ListFooterComponent={() => {
+                    return <View style={{ height: 100 }} />;
+                }}
+            />
         </Animated.View>
+
     );
 };
 {

@@ -34,6 +34,7 @@ const months = [
     "December",
 ];
 
+
 export default MonthSelector = ({
     currentYear,
     currentMonth,
@@ -47,16 +48,18 @@ export default MonthSelector = ({
 
     const interpolatedHeight = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [50, 200],
+        outputRange: [45, 200],
     });
 
-    const interpolatedTop = heightRef.interpolate({
+    const interpolatedWidth = heightRef.interpolate({
         inputRange: [0, 1],
         outputRange: [
-            RNStatusBar.currentHeight,
-            RNStatusBar.currentHeight * 2,
+            "65%",
+            "65%",
         ],
     });
+
+
 
     const interpolatedBackgroundColor = heightRef.interpolate({
         inputRange: [0, 1],
@@ -74,8 +77,8 @@ export default MonthSelector = ({
                 style={{
                     width: "100%",
                     alignItems: "center",
-                    justifyContent: "center",
                     height: 50,
+                    //TODO: maybe add some extra margin to january and december
                     marginBottom: 10,
                 }}
             >
@@ -83,7 +86,9 @@ export default MonthSelector = ({
                     style={[
                         {
                             color: theme.primary,
-                            fontFamily: "Poppins-Regular",
+                            //TODO: set the font to big if it is the current month, doesn't work
+                            fontFamily: item === currentMonth
+                                ? "Poppins-Black" : "Poppins-Light",
                             fontSize: 34,
                         },
                     ]}
@@ -101,25 +106,25 @@ export default MonthSelector = ({
             firstRender.current = false;
         } else {
             if (showingMenu.state) {
-                showMenu();
+                showMenu(showingMenu.index);
             } else {
                 hideMenu(showingMenu.index);
             }
         }
     }, [showingMenu]);
 
-    const showMenu = () => {
-        Animated.spring(heightRef, {
+    const showMenu = (month) => {
+        Animated.parallel([Animated.spring(heightRef, {
             toValue: 1,
             useNativeDriver: false,
-        }).start();
-        // flatListRef.current.scrollToIndex({
-        //     index: months.indexOf(showingMenu.month) - 2,
-        //     animated: true,
-        // });
+        }).start(),
+        flatListRef.current.scrollToIndex({
+            index: month - 1,
+            animated: true,
+        })])
     };
 
-    const hideMenu = (month = 0) => {
+    const hideMenu = (month) => {
         console.log(month)
         Animated.parallel([
             Animated.spring(heightRef, {
@@ -143,9 +148,10 @@ export default MonthSelector = ({
                 backgroundColor: interpolatedBackgroundColor,
                 borderRadius: 10,
                 zIndex: 51,
-                width: "70%",
+                paddingHorizontal: 16,
                 borderWIdth: 2,
-                borderColor: 'green'
+                borderColor: 'green',
+                overflow: 'visible'
             }}
         >
             <FlatList

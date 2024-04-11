@@ -102,6 +102,7 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
                             flexDirection: "row",
                             width: "100%",
                             zIndex: -10,
+                            marginTop: 10
                         }}
                     >
                         {oneLetterDays.map((item, index) => (

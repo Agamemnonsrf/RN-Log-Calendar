@@ -10,7 +10,6 @@ import {
     Pressable, StatusBar as RNStatusBar
 } from "react-native";
 import Day from "./day";
-import YearSelector from "./yearSelector";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
 import { render } from "react-dom";
@@ -35,7 +34,8 @@ const months = [
 ];
 
 export default MonthSelector = ({
-    currentYear
+    currentYear,
+    selectNewYear
 }) => {
     const { theme } = useContext(FlatListRefContext);
     const heightRef = useRef(new Animated.Value(0)).current;
@@ -44,14 +44,14 @@ export default MonthSelector = ({
 
     const interpolatedHeight = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [50, 200],
+        outputRange: [38, 200],
     });
 
-    const interpolatedTop = heightRef.interpolate({
+    const interpolatedWidth = heightRef.interpolate({
         inputRange: [0, 1],
         outputRange: [
-            RNStatusBar.currentHeight,
-            RNStatusBar.currentHeight * 2,
+            "22%",
+            "30%",
         ],
     });
 
@@ -65,7 +65,7 @@ export default MonthSelector = ({
             <Pressable
                 onPress={() => {
                     setShowingMenu((prev) => {
-                        return { state: !prev.state, month: item, index };
+                        return { state: !prev.state, index };
                     });
                 }}
                 style={{
@@ -73,7 +73,7 @@ export default MonthSelector = ({
                     alignItems: "center",
                     justifyContent: "center",
                     height: 50,
-                    marginBottom: 10,
+                    marginBottom: 0,
                 }}
             >
                 <Text
@@ -81,11 +81,11 @@ export default MonthSelector = ({
                         {
                             color: theme.primary,
                             fontFamily: "Poppins-Regular",
-                            fontSize: 34,
+                            fontSize: 21,
                         },
                     ]}
                 >
-                    {item}
+                    {index}
                 </Text>
             </Pressable>
         );
@@ -116,20 +116,20 @@ export default MonthSelector = ({
         // });
     };
 
-    const hideMenu = (month = 0) => {
-        console.log(month)
+    const hideMenu = (year = 0) => {
+        console.log(year)
         Animated.parallel([
             Animated.spring(heightRef, {
                 toValue: 0,
                 useNativeDriver: false,
             }),
             flatListRef.current.scrollToIndex({
-                index: month,
+                index: year,
                 animated: true,
             }),
         ]).start();
         setTimeout(() => {
-            selectNewMonth(month % 12 + 1);
+            selectNewYear(year);
         }, 300)
     };
 
@@ -140,7 +140,7 @@ export default MonthSelector = ({
                 backgroundColor: interpolatedBackgroundColor,
                 borderRadius: 10,
                 zIndex: 51,
-                width: "70%",
+                width: interpolatedWidth,
                 borderWIdth: 2,
                 borderColor: 'green'
             }}
@@ -151,12 +151,12 @@ export default MonthSelector = ({
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 getItemLayout={(data, index) => {
-                    return { length: 60, offset: 60 * index, index };
+                    return { length: 50, offset: 50 * index, index };
                 }}
-                data={Array(1000).fill(months).flat()}
-                keyExtractor={(item, index) => item + index}
+                data={Array(4000)}
+                keyExtractor={(item, index) => index}
                 contentContainerStyle={{}}
-                initialScrollIndex={(currentMonth - 1) + 12 * 500}
+                initialScrollIndex={currentYear}
                 renderItem={(item, index) => renderItem(item, index)}
                 ListFooterComponent={() => {
                     return <View style={{ height: 100 }} />;

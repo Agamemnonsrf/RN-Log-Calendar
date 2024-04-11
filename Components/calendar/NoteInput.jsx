@@ -26,7 +26,8 @@ import FlatListRefContext from "../context/flatListContext";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-const textInputHeight = screenHeight * 0.3
+const textInputHeight = screenHeight * 0.4
+const textinputWidth = screenWidth * 0.99
 
 export default NoteInput = forwardRef(({ }, ref) => {
     const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -58,24 +59,17 @@ export default NoteInput = forwardRef(({ }, ref) => {
     const focusPanRef = useRef(new Animated.Value(0)).current;
     const textPanRef = useRef(new Animated.Value(0)).current;
 
+    const textInputPosition = useRef(new Animated.Value(0)).current;
+
     const focusTextInput = (dir) => {
         Animated.parallel([
-            Animated.timing(overlayHeight, {
+            Animated.timing(textInputPosition, {
                 toValue: dir,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-            Animated.timing(overlayOpacity, {
-                toValue: dir,
-                duration: 300,
-                useNativeDriver: false,
-            }),
-            Animated.spring(focusPanRef, {
-                toValue: dir,
+                duration: 700,
                 useNativeDriver: false,
             }),
         ]).start(() => {
-            setFocused(dir === 1 ? true : false);
+            //setFocused(dir === 1 ? true : false);
         });
     };
 
@@ -159,6 +153,8 @@ export default NoteInput = forwardRef(({ }, ref) => {
         debouncedSaveText(date, text); // Trigger debounced saveText function
     };
 
+    const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
     const interpolatedHeight = overlayHeight.interpolate({
         inputRange: [0, 1],
         outputRange: ["100%", "100%"],
@@ -180,9 +176,10 @@ export default NoteInput = forwardRef(({ }, ref) => {
 
     return (
         <>
-            <Animated.View
-                style={{
-                    width: "95%",
+
+            <Pressable
+                onPressIn={() => {
+                    focusTextInput(1);
                 }}
             >
                 <View
@@ -194,16 +191,14 @@ export default NoteInput = forwardRef(({ }, ref) => {
                         top: 0,
                     }}
                 >
-                    <Animated.View
+                    <View
                         style={{
-                            borderRadius: 100,
-                            paddingHorizontal: 5,
+                            borderRadius: 100, paddingHorizontal: 5,
                             margin: 5,
                             justifyContent: "center",
                             alignItems: "center",
                             top: 0,
                             zIndex: 11,
-                            left: interpolatedTextOffset,
                         }}
                     >
                         <Text
@@ -214,8 +209,8 @@ export default NoteInput = forwardRef(({ }, ref) => {
                         >
                             {date.toDateString()}
                         </Text>
-                    </Animated.View>
-                    <Animated.View
+                    </View>
+                    <View
                         style={{
                             zIndex: 6,
                             borderRadius: 100,
@@ -227,49 +222,55 @@ export default NoteInput = forwardRef(({ }, ref) => {
                         }}
                     >
                         {loading ? <Spinner /> : <SyncedIcon />}
-                    </Animated.View>
+                    </View>
                 </View>
-                <Pressable
-                    onPressIn={() => {
-                        focusTextInput(1);
-                    }}
-                >
-                    <TextInput
-                        ref={textInputRef}
-                        editable={focused}
-                        multiline
-                        numberOfLines={8}
-                        maxLength={2000}
-                        onChangeText={(text) => handleTextChange(text)}
-                        value={text}
-                        style={[
-                            styles.textInput,
-                            {
-                                width: "100%",
-                                backgroundColor: focused
-                                    ? theme.background
-                                    : theme.quaternary,
-                                color: focused
-                                    ? theme.primary
-                                    : theme.primaryHighFade,
-                                textAlignVertical: "top",
-                                fontSize: 18,
-                                shadowColor: "black",
-                                shadowOffset: {
-                                    width: 3,
-                                    height: 2,
+                <AnimatedTextInput
+                    ref={textInputRef}
+                    editable={focused}
+                    multiline
+                    numberOfLines={8}
+                    maxLength={2000}
+                    onChangeText={(text) => handleTextChange(text)}
+                    value={text}
+                    style={[
+                        styles.textInput,
+                        {
+                            height: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [textInputHeight, screenHeight],
+                            }),
+                            width: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [textinputWidth, screenWidth],
+                            }),
+                            transform: [
+                                {
+                                    translateY: textInputPosition.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, -100],
+                                    }),
+
                                 },
-                                shadowOpacity: 1,
-                                shadowRadius: 3.84,
-                                elevation: 5,
+                            ],
+                            backgroundColor: theme.quaternary,
+                            color: theme.primary,
+                            textAlignVertical: "top",
+                            fontSize: 18,
+                            shadowColor: "black",
+                            shadowOffset: {
+                                width: 3,
+                                height: 2,
                             },
-                        ]}
-                        placeholder={focused ? "Your notes here..." : ""}
-                        placeholderTextColor={theme.primaryHighFade}
-                    />
-                </Pressable>
-            </Animated.View>
-            <AnimatedPressable
+                            shadowOpacity: 1,
+                            shadowRadius: 3.84,
+                            elevation: 5,
+                        },
+                    ]}
+                    placeholder={focused ? "Your notes here..." : ""}
+                    placeholderTextColor={theme.primaryHighFade}
+                />
+            </Pressable>
+            {/* <AnimatedPressable
                 style={{
                     position: "absolute",
                     bottom: 0,
@@ -284,7 +285,7 @@ export default NoteInput = forwardRef(({ }, ref) => {
                     focusTextInput(0);
                     hideDropdown();
                 }}
-            />
+            /> */}
         </>
     );
 });

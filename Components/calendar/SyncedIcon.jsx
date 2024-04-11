@@ -13,6 +13,7 @@ export default SyncedIcon = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 alignSelf: "flex-end",
+                gap: 3
             }}
         >
             <Text
@@ -23,7 +24,16 @@ export default SyncedIcon = () => {
             >
                 Synced{" "}
             </Text>
-            <Feather name="check" size={24} color={theme.primaryHighFade} />
+            {/* <View style={{
+                width: 18,
+                height: 18,
+                borderRadius: 100,
+                backgroundColor: theme.primaryVeryHighFade,
+                justifyContent: "flex-end",
+                alignItems: "center",
+            }}> */}
+            <Feather name="check" size={17} color={theme.primaryHighFade} />
+            {/* </View> */}
         </View>
     );
 };

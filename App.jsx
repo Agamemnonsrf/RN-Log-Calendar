@@ -8,6 +8,7 @@ import {
     Pressable,
     Text,
     Button,
+    TouchableOpacity,
     StatusBar as RNStatusBar
 } from "react-native";
 import Layout from "./Components/layout/layout";
@@ -35,9 +36,12 @@ export default function App() {
     const [theme, setTheme] = useState(colorThemes["defaultDark"]);
     const [appIsReady, setAppIsReady] = useState(false);
     const position1 = useRef(new Animated.Value(0)).current;
+    const returnButtonPosition = useRef(new Animated.Value(0)).current;
     const dropDownRef = useRef();
     const sideMenuRef = useRef();
     const dayRef = useRef();
+
+    const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
     const [fontsLoaded] = useFonts({
         "Poppins-Black": require("./assets/fonts/Poppins/Poppins-Black.ttf"),
@@ -69,9 +73,18 @@ export default function App() {
     useEffect(() => {
         Animated.timing(position1, {
             toValue: 0,
+            duration: 200,
+            useNativeDriver: false,
+        }).start();
+
+        const isItTheCurrentDate = currentMonth !== new Date().getMonth() + 1 || currentYear !== new Date().getFullYear()
+
+        Animated.timing(returnButtonPosition, {
+            toValue: isItTheCurrentDate ? 0 : 1,
             duration: 400,
             useNativeDriver: false,
         }).start();
+
     }, [currentMonth, currentYear]);
 
     const onLayoutRootView = useCallback(async () => {
@@ -81,16 +94,16 @@ export default function App() {
     }, [appIsReady]);
 
     const selectNewMonth = (newMonth) => {
-        let newMonthCall;
+        let previousMonth;
         setCurrentMonth((prev) => {
-            newMonthCall = prev;
+            previousMonth = prev;
             return prev;
         });
 
-        if (newMonth === newMonthCall) return;
+        if (newMonth === previousMonth) return;
         Animated.timing(position1, {
             toValue: -screenWidth,
-            duration: 400,
+            duration: 200,
             useNativeDriver: false,
         }).start(() => {
             setCurrentMonth(newMonth);
@@ -107,7 +120,7 @@ export default function App() {
         if (newYear === newYearCall) return;
         Animated.timing(position1, {
             toValue: -screenWidth,
-            duration: 400,
+            duration: 200,
             useNativeDriver: false,
         }).start(() => {
             setCurrentYear(newYear);
@@ -143,10 +156,10 @@ export default function App() {
                 <View
                     style={{
                         paddingHorizontal: 10,
-                        paddingVertical: 10,
+                        paddingVertical: 8,
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "center",
+                        justifyContent: "flex-end",
                         zIndex: 10,
                         borderBottomWidth: 1,
                         borderBottomColor: theme.primaryHighFade,
@@ -155,21 +168,28 @@ export default function App() {
                     <View style={{
                         position: "absolute",
                         left: 10,
-                        bottom: 13.5
+                        bottom: 10
                     }}>
                         <BarsMenuIcon />
                     </View>
-                    <MonthSelector
-                        currentYear={currentYear}
-                        currentMonth={currentMonth}
-                        selectNewMonth={selectNewMonth}
-                    />
-                    <YearSelector currentYear={currentYear} />
+                    <View style={{ flexDirection: 'row', justifyContent: "flex-end", alignItems: "flex-end", gap: 8 }}>
+
+                        <MonthSelector
+                            currentYear={currentYear}
+                            currentMonth={currentMonth}
+                            selectNewMonth={selectNewMonth}
+                        />
+                        <YearSelector currentYear={currentYear} selectNewYear={selectNewYear} />
+                    </View>
                 </View>
 
                 <Animated.View
                     style={{
-                        transform: [{ translateX: position1 }],
+                        opacity: position1.interpolate({
+                            inputRange: [-screenWidth, 0],
+                            outputRange: [0, 1],
+                        }),
+                        // transform: [{ opacity: position1 === 0 ? 1 : 0 }],
                     }}
                 >
                     <CurrentMonth
@@ -180,11 +200,34 @@ export default function App() {
                 </Animated.View>
                 <View style={{
                     flex: 1,
-                    justifyContent: "center",
+
+                    alignItems: "center",
 
                 }}>
                     <NoteInput ref={dropDownRef} />
                 </View>
+                <AnimatedTouchableOpacity
+                    onPress={() => {
+                        //TODO: make smooth
+                        setCurrentMonth(new Date().getMonth() + 1);
+                        setCurrentYear(new Date().getFullYear());
+                    }}
+                    style={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: 10,
+                        zIndex: 100,
+                        backgroundColor: "white",
+                        padding: 10,
+                        paddingBottom: 20,
+                        borderRadius: 10,
+                        transform: [{ translateY: returnButtonPosition.interpolate({ inputRange: [0, 1], outputRange: [0, 100] }) }]
+                    }}>
+                    <Text style={{
+                        color: "black",
+                        fontFamily: "Poppins-Bold",
+                    }}>Return To Current Month</Text>
+                </AnimatedTouchableOpacity>
                 <StatusBar style="light" translucent={true} />
             </View>
         </FlatListRefContext.Provider>

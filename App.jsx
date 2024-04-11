@@ -24,6 +24,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import NoteInput from "./Components/calendar/NoteInput";
 import SideMenu from "./Components/layout/SideMenu";
 import MonthSelector from "./Components/calendar/MonthSelector";
+import YearSelector from "./Components/calendar/yearSelector";
 
 const screenWidth = Dimensions.get("window").width;
 SplashScreen.preventAutoHideAsync();
@@ -163,6 +164,7 @@ export default function App() {
                         currentMonth={currentMonth}
                         selectNewMonth={selectNewMonth}
                     />
+                    <YearSelector currentYear={currentYear} />
                 </View>
 
                 <Animated.View

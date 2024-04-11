@@ -63,12 +63,12 @@ export default MonthSelector = ({
         outputRange: ["rgba(50, 50, 50, 0)", "rgba(50, 50, 50, 1)"],
     });
 
-    const renderItem = ({ item }) => {
+    const renderItem = ({ item, index }) => {
         return (
             <Pressable
                 onPress={() => {
                     setShowingMenu((prev) => {
-                        return { state: !prev.state, month: item };
+                        return { state: !prev.state, month: item, index };
                     });
                 }}
                 style={{
@@ -100,12 +100,10 @@ export default MonthSelector = ({
         if (firstRender.current) {
             firstRender.current = false;
         } else {
-            console.log(showingMenu.state);
             if (showingMenu.state) {
-                console.log("show");
                 showMenu();
             } else {
-                hideMenu(months.indexOf(showingMenu.month));
+                hideMenu(showingMenu.index);
             }
         }
     }, [showingMenu]);
@@ -119,10 +117,10 @@ export default MonthSelector = ({
         //     index: months.indexOf(showingMenu.month) - 2,
         //     animated: true,
         // });
-        flatListRef.current.scroll
     };
 
     const hideMenu = (month = 0) => {
+        console.log(month)
         Animated.parallel([
             Animated.spring(heightRef, {
                 toValue: 0,
@@ -134,9 +132,8 @@ export default MonthSelector = ({
             }),
         ]).start();
         setTimeout(() => {
-            selectNewMonth(month + 1);
+            selectNewMonth(month % 12 + 1);
         }, 300)
-
     };
 
     return (
@@ -159,11 +156,11 @@ export default MonthSelector = ({
                 getItemLayout={(data, index) => {
                     return { length: 60, offset: 60 * index, index };
                 }}
-                data={months}
+                data={Array(1000).fill(months).flat()}
                 keyExtractor={(item, index) => item + index}
                 contentContainerStyle={{}}
-                initialScrollIndex={currentMonth - 1}
-                renderItem={renderItem}
+                initialScrollIndex={(currentMonth - 1) + 12 * 500}
+                renderItem={(item, index) => renderItem(item, index)}
                 ListFooterComponent={() => {
                     return <View style={{ height: 100 }} />;
                 }}

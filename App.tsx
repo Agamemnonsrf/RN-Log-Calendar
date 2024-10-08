@@ -203,9 +203,6 @@ export default function App() {
                 <Animated.View style={{
                     justifyContent: "flex-end",
                     alignItems: "center",
-                    width: "100%",
-                    height: "100%",
-                    bottom: 0
 
                 }}>
                     <NoteInput ref={dropDownRef} />

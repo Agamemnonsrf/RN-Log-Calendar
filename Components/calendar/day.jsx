@@ -89,7 +89,7 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
 
     const interpolatedColorSelectorWidth = colorSelectorRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [0, 150],
+        outputRange: [0, 170],
     });
 
     const interpolatedColorSelectorHeight = colorSelectorRef.interpolate({
@@ -124,48 +124,71 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     },
                 ]}
             >
-                {hasData && (
-                    <Animated.View
-                        style={{
-                            height: interpolatedColorSelectorHeight,
-                            width: interpolatedColorSelectorWidth,
-                            borderRadius: 100,
-                            backgroundColor: theme.background,
-                            position: "absolute",
-                            top: interpolatedColorSelectorPosition,
-                            zIndex: 10,
-                            overflow: "hidden",
-                            flexDirection: "row",
-                            justifyContent: "space-evenly",
-                            alignItems: "center",
+
+                <Animated.View
+                    style={{
+                        height: interpolatedColorSelectorHeight,
+                        width: interpolatedColorSelectorWidth,
+                        borderRadius: 100,
+                        backgroundColor: theme.background,
+                        position: "absolute",
+                        top: interpolatedColorSelectorPosition,
+                        zIndex: 10,
+                        overflow: "hidden",
+                        flexDirection: "row",
+                        justifyContent: "space-evenly",
+                        alignItems: "center",
+                    }}
+                >
+                    <ScrollView
+                        horizontal
+                        contentContainerStyle={{
+                            justifyContent: "space-around",
+                            gap: 10,
+                            paddingHorizontal: 10,
                         }}
+                        showsHorizontalScrollIndicator={false}
                     >
-                        <ScrollView
-                            horizontal
-                            contentContainerStyle={{
-                                justifyContent: "space-around",
-                                gap: 10,
-                                paddingHorizontal: 10,
+                        <AnimatedTouchableOpacity
+                            key={"remove color"}
+                            style={{
+                                width: interpolatedColorWidth,
+                                height: interpolatedColorHeight,
+                                borderRadius: 100,
+                                borderWidth: 1,
+                                borderColor: theme.primary,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                            onPress={() => {
+                                setColor("white");
+                                hideColorSelector();
                             }}
                         >
-                            {coolors.map((coolor) => (
-                                <AnimatedTouchableOpacity
-                                    key={coolor}
-                                    style={{
-                                        width: interpolatedColorWidth,
-                                        height: interpolatedColorHeight,
-                                        borderRadius: 100,
-                                        backgroundColor: coolor,
-                                    }}
-                                    onPress={() => {
-                                        setColor(coolor);
-                                        hideColorSelector();
-                                    }}
-                                />
-                            ))}
-                        </ScrollView>
-                    </Animated.View>
-                )}
+                            {<MaterialIcons
+                                name="close"
+                                size={10}
+                                color={theme.primary}
+                            />}
+                        </AnimatedTouchableOpacity>
+                        {coolors.map((coolor) => (
+                            <AnimatedTouchableOpacity
+                                key={coolor}
+                                style={{
+                                    width: interpolatedColorWidth,
+                                    height: interpolatedColorHeight,
+                                    borderRadius: 100,
+                                    backgroundColor: coolor,
+                                }}
+                                onPress={() => {
+                                    setColor(coolor);
+                                    hideColorSelector();
+                                }}
+                            />
+                        ))}
+                    </ScrollView>
+                </Animated.View>
+
                 <TouchableOpacity
                     style={{
                         justifyContent: "center",
@@ -199,6 +222,20 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                             <MaterialIcons
                                 name="today"
                                 size={10}
+                                color={color ? "black" : theme.primary}
+                            />
+                        </View>
+                    )}
+                    {hasData && (
+                        <View style={{
+                            position: "absolute",
+                            top: 1,
+                            right: 1,
+                            zIndex: 10,
+                        }}>
+                            <MaterialCommunityIcons
+                                name="checkbox-blank-circle"
+                                size={6}
                                 color={color ? "black" : theme.primary}
                             />
                         </View>

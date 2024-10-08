@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { Animated } from "react-native";
+import { Animated, Easing } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import FlatListRefContext from "../context/flatListContext";
-import { ActivityIndicator, View } from "react-native-web";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-export default SpinnerIcon = () => {
+//const AnimatedFontAwesome = Animated.createAnimatedComponent(FontAwesome);
+
+const SpinnerIcon = () => {
     const spinValue = useRef(new Animated.Value(0)).current;
     const { theme } = useContext(FlatListRefContext);
-    const AnimatedEvilIcons = Animated.createAnimatedComponent(EvilIcons)
+    // const AnimatedEvilIcons = Animated.createAnimatedComponent(EvilIcons)
 
     useEffect(() => {
         Animated.loop(
@@ -15,6 +17,7 @@ export default SpinnerIcon = () => {
                 toValue: 1,
                 duration: 1200,
                 useNativeDriver: true,
+                //easing: Easing.inOut(Easing.ease),
             })
         ).start();
     }, []);
@@ -28,9 +31,10 @@ export default SpinnerIcon = () => {
         <Animated.View
             style={{
                 transform: [{ rotate: spin }],
-                // transformOrigin: [20, 20, 20],
+                //transformOrigin: [20, 20, 20],
                 // borderWidth: 2,
                 // borderColor: 'green',
+
                 justifyContent: "center",
                 alignItems: "center"
             }}
@@ -43,11 +47,22 @@ export default SpinnerIcon = () => {
                 style={{
                     // borderWidth: 2,
                     // borderColor: 'red',
-                    paddingLeft: 0,
-                    paddingBottom: 5,
-                    paddingTop: 0,
+                    // paddingLeft: 0,
+                    // paddingBottom: 5,
+                    // paddingTop: 0,
                 }}
             />
+            {/* <FontAwesome name="spinner"
+                size={20}
+                color={theme.primaryHighFade}
+                style={{
+                    // borderWidth: 2,
+                    // borderColor: 'red',
+                    // paddingLeft: 0,
+                    // paddingBottom: 5,
+                    // paddingTop: 0,
+                }} /> */}
         </Animated.View>
     );
 };
+export default SpinnerIcon;

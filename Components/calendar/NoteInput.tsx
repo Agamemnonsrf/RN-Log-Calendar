@@ -33,8 +33,10 @@ const screenWidth = Dimensions.get("window").width;
 const textInputHeight = screenHeight * 0.3
 const textinputWidth = screenWidth * 0.90
 
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 const NoteInput = forwardRef(({ }, ref) => {
-    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
     const { theme } = useContext(FlatListRefContext);
     const randomnumber = Math.floor(Math.random() * 10);
     console.log("rerendering" + randomnumber)
@@ -45,6 +47,21 @@ const NoteInput = forwardRef(({ }, ref) => {
     const [focused, setFocused] = useState(false);
     const [animationPlaying, setAnimationPlaying] = useState(false);
     const [closeAnimationPlaying, setCloseAnimationPlaying] = useState(false)
+    const [keyboardStatus, setKeyboardStatus] = useState(false);
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardStatus(true);
+        });
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardStatus(false);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
 
     useEffect(() => {
         const getData = async () => {
@@ -151,32 +168,32 @@ const NoteInput = forwardRef(({ }, ref) => {
         }
     };
 
-    // const debounce = (func, delay) => {
-    //     let timeoutId;
-    //     return function (...args) {
-    //         clearTimeout(timeoutId);
-    //         timeoutId = setTimeout(() => func.apply(this, args), delay);
-    //     };
-    // };
+    const debounce = (func: Function, delay: number) => {
+        let timeoutId: NodeJS.Timeout | undefined;
+        return function (this: any, ...args: any[]) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
 
-    // const debouncedSaveText = useRef(
-    //     debounce(async (date, text) => {
-    //         try {
-    //             await AsyncStorage.setItem(date.toDateString(), text);
-    //             setLoading(false); // Set loading to false after saving is complete
-    //         } catch (e) {
-    //             console.log(e);
-    //         }
-    //     }, 500)
-    // ).current;
+    const debouncedSaveText = useRef(
+        debounce(async (date: Date, text: string) => {
+            try {
+                await AsyncStorage.setItem(date.toDateString(), text);
+                setLoading(false); // Set loading to false after saving is complete
+            } catch (e) {
+                console.log(e);
+            }
+        }, 500)
+    ).current;
 
     const handleTextChange = (text: string) => {
         setText(text);
-        //setLoading(true); // Set loading to true when text is changed
-        //debouncedSaveText(date, text);
+        setLoading(true); // Set loading to true when text is changed
+        debouncedSaveText(date, text);
     }
 
-    const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
 
     return (
         <AnimatedPressable
@@ -203,7 +220,20 @@ const NoteInput = forwardRef(({ }, ref) => {
             <Animated.View
                 style={{
                     flexDirection: "row",
+                    alignItems: "center",
                     justifyContent: "space-between",
+                    backgroundColor: textInputPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [theme.quaternary, theme.background]
+                    }),
+                    borderBottomLeftRadius: textInputPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, 10]
+                    }),
+                    borderBottomRightRadius: textInputPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, 10]
+                    }),
                     width: textInputPosition.interpolate({
                         inputRange: [0, 1],
                         outputRange: [textinputWidth, screenWidth],
@@ -211,52 +241,62 @@ const NoteInput = forwardRef(({ }, ref) => {
                     position: "absolute",
                     top: 0,
                     zIndex: 20,
+                    height: textInputPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [40, 70],
+                    }),
                 }}
             >
-                <Animated.View
+                <View
                     style={{
-                        borderRadius: 100,
-                        paddingHorizontal: 5,
-                        margin: 5,
-
-                        justifyContent: "center",
+                        flexDirection: "row",
                         alignItems: "center",
-                        top: 0,
-                        zIndex: 11,
+                        justifyContent: "space-between",
+                        flex: 10
                     }}
                 >
-                    <Text
+                    <Animated.View
                         style={{
-                            color: theme.primaryHighFade,
-                            fontFamily: "Poppins-Medium",
+                            borderRadius: 100,
+                            paddingHorizontal: 5,
+                            margin: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            top: 0,
+                            zIndex: 11,
                         }}
                     >
-                        {date.toDateString()}
-                    </Text>
-                </Animated.View>
-                <Animated.View
-                    style={{
-                        zIndex: 11,
-                        borderRadius: 100,
-                        paddingHorizontal: 5,
-                        marginRight: textInputPosition.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0, 50],
-                        }),
-                        margin: 8,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        top: 0,
-                    }}
-                >
-                    {loading ? <Spinner /> : <SyncedIcon />}
-                </Animated.View>
+                        <Text
+                            style={{
+                                color: theme.primaryHighFade,
+                                fontFamily: "Poppins-Medium",
+                            }}
+                        >
+                            {date.toDateString()}
+                        </Text>
+                    </Animated.View>
+                    <Animated.View
+                        style={{
+                            zIndex: 11,
+                            paddingHorizontal: 5,
+                            marginRight: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [-40, 10],
+                            }),
+                            justifyContent: "center",
+                            alignItems: "center",
+                            top: 0,
+                        }}
+                    >
+                        {loading ? <Spinner /> : <SyncedIcon />}
+                    </Animated.View>
+                </View>
                 <AnimatedPressable
                     onPress={() => {
                         setCloseAnimationPlaying(true);
                     }}
                     style={{
-                        borderRadius: 100,
+                        flex: 1,
                         paddingHorizontal: 5,
                         margin: 2.5,
                         marginTop: 6,
@@ -264,7 +304,6 @@ const NoteInput = forwardRef(({ }, ref) => {
                         alignItems: "center",
                         top: 0,
                         zIndex: 11,
-                        position: "absolute",
                         right: 0,
                         opacity: textInputPosition.interpolate({
                             inputRange: [0, 1],
@@ -290,15 +329,10 @@ const NoteInput = forwardRef(({ }, ref) => {
                             inputRange: [0, 1],
                             outputRange: [textinputWidth, screenWidth],
                         }),
-                        transform: [
-                            {
-                                translateY: textInputPosition.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: [0, 0],
-                                }),
-                            },
-                        ],
-                        paddingTop: 30,
+                        paddingTop: textInputPosition.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [40, 75],
+                        }),
                         zIndex: 10,
                         backgroundColor: theme.quaternary,
                         color: theme.primary,
@@ -316,10 +350,6 @@ const NoteInput = forwardRef(({ }, ref) => {
                 ]}
                 placeholder={"Your notes here..."}
                 placeholderTextColor={theme.primaryHighFade}
-                onFocus={() => {
-                    if (textInputRef.current)
-                        textInputRef.current.focus();
-                }}
             />
         </AnimatedPressable>
     );

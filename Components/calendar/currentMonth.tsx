@@ -6,22 +6,202 @@ import {
     FlatList,
     Dimensions,
     StyleSheet,
+    Button,
+    Easing,
 } from "react-native";
 import Day from "./day";
 import YearSelector from "./yearSelector";
 import Constants from "expo-constants";
 import FlatListRefContext from "../context/flatListContext";
 import MonthSelector from "./MonthSelector";
+import { LinearGradient } from "expo-linear-gradient";
 
 const screenHeight =
     Dimensions.get("window").height - Constants.statusBarHeight;
 const screenWidth = Dimensions.get("window").width;
 const oneLetterDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+const windowWidth = Dimensions.get("window").width;
+const windowHeight =
+    Dimensions.get("window").height - Constants.statusBarHeight;
+const containerWidth = windowWidth / 7 - 5;
+const containerHeight = windowHeight / 12.5;
+
+interface VerticalGradientBorderProps {
+    containerHeight: number;
+    colAnim: Animated.Value;
+    selectedSection: number;
+    theme: { primaryHighFade: string };
+    numRows: number;
+}
+
+const AnimatedVerticalLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
+const VerticalGradientBorder: React.FC<VerticalGradientBorderProps> = ({ containerHeight, colAnim, selectedSection, theme, numRows }) => {
+    const positionAnim = useRef(new Animated.Value(0)).current;
+
+    // Trigger animation when selectedSection changes
+    const animateSection = (targetValue: number) => {
+        Animated.timing(positionAnim, {
+            toValue: targetValue,
+            duration: 500,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true, // We aren't animating layout directly
+        }).start();
+    };
+    //I want to make a section useRef which cycles between number 2-7,
+    //so it will first be 2, then 3, then 4, then 5, then 6, then 7, then 2, then 3, etc.
+    const section = useRef(1);
+
+    const handlePress = () => {
+        section.current = section.current === numRows ? 1 : section.current + 1;
+        const targetPosition = (section.current - 1) / 6; // Map the section to [0, 1] range
+        console.log(section);
+        animateSection(section.current);
+        console.log(xInterpolation)
+    };
+
+
+    // Interpolating column animation based on selected section
+    const value = colAnim.interpolate({
+        inputRange: Array.from({ length: numRows }, (_, i) => i),
+        outputRange: Array.from({ length: numRows }, (_, i) => {
+            return i * (containerHeight + 2);
+        })
+    });
+    console.log(numRows)
+    const offset = numRows === 6 ? 190 : 160;
+    const xInterpolation = positionAnim.interpolate({
+        inputRange: Array.from({ length: numRows }, (_, i) => i),
+        outputRange: Array.from({ length: numRows }, (_, i) => {
+            return (i * (containerHeight - 3)) - offset;
+        })
+    })
+    console.log(xInterpolation)
+    return (
+        <>
+            <View style={{
+                position: "absolute",
+                zIndex: 100,
+            }}>
+                <Button title="animate opacity" onPress={handlePress} />
+            </View>
+
+            <Animated.View style={{
+                width: containerHeight,
+                position: 'absolute',
+                transform: [{ translateX: value }, { translateY: xInterpolation }],
+                height: '100%',
+            }}>
+                {/* Left Border with Animated Gradient */}
+                <AnimatedVerticalLinearGradient
+                    colors={["rgba(255,255,255,0.0)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.0)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }} // Vertical gradient
+                    locations={[0.3, 0.6, 0.9]} // Dynamic gradient stops
+                    style={{ width: 1, height: '100%', position: 'absolute', left: 0 }}
+                />
+
+                {/* Right Border with Animated Gradient */}
+                <AnimatedVerticalLinearGradient
+                    colors={["rgba(255,255,255,0.0)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.0)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    locations={[0.3, 0.6, 0.9]} // Dynamic gradient stops
+                    style={{ width: 1, height: '100%', position: 'absolute', right: 0 }}
+                />
+            </Animated.View>
+        </>
+    );
+};
+
+
+interface GradientBorderProps {
+    containerHeight: number;
+    rowAnim: Animated.Value;
+    selectedSection: number; // The number between 1 and 6
+    theme: { primaryHighFade: string };
+}
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+const GradientBorder: React.FC<GradientBorderProps> = ({ containerHeight, rowAnim, selectedSection, theme }) => {
+    const positionAnim = useRef(new Animated.Value(0)).current;
+
+    // Trigger animation when selectedSection changes
+    const animateSection = (targetValue: number) => {
+        Animated.timing(positionAnim, {
+            toValue: targetValue,
+            duration: 500,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true, // We aren't animating layout directly
+        }).start();
+    };
+
+    // Calculate the gradient position based on selectedSection (scaled to percentage)
+    const section = useRef(1);
+    const handlePress = () => {
+        section.current = section.current === 7 ? 1 : section.current + 1;
+        console.log(section);
+        animateSection(section.current);
+    };
+    const offset = 0;
+    const yInterpolation = positionAnim.interpolate({
+        inputRange: Array.from({ length: 7 }, (_, i) => i),
+        outputRange: Array.from({ length: 7 }, (_, i) => containerHeight * (i + 1) - (containerHeight / 2) - 274)
+    })
+
+    const value = rowAnim.interpolate({
+        inputRange: Array.from({ length: 7 }, (_, i) => i),
+        outputRange: Array.from({ length: 7 }, (_, i) => containerHeight * (i + 1) - (containerHeight / 2) + 4)
+    });
+
+    return (
+        <>
+            <View style={{
+                position: "absolute",
+                top: -30,
+                left: 0,
+                zIndex: 100,
+            }}>
+                <Button title="animate opacity"
+                    onPress={handlePress} />
+            </View>
+            <Animated.View style={{
+                height: containerHeight,
+                position: 'absolute',
+                transform: [{ translateY: value }, { translateX: yInterpolation }],
+                width: '100%',
+            }}>
+                {/* Top Border with Animated Gradient */}
+                <AnimatedLinearGradient
+                    colors={["rgba(255,255,255,0.0)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.0)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    locations={[0.3, 0.6, 0.9]} // Dynamic gradient stops
+                    style={{ height: 1, width: '100%', position: 'absolute', top: 0 }}
+                />
+
+                {/* Bottom Border with Animated Gradient */}
+                <AnimatedLinearGradient
+                    colors={["rgba(255,255,255,0.0)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.0)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    locations={[0.3, 0.6, 0.9]}
+                    style={{ height: 1, width: '100%', position: 'absolute', bottom: 0 }}
+                />
+            </Animated.View>
+        </>
+    );
+};
+
+
+
+
+
 const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }: { currentMonth: number, setCurrentYear: Function, currentYear: number }) => {
     const { theme } = useContext(FlatListRefContext);
     const focusPanRef = useRef(new Animated.Value(0)).current;
-
+    const rowAnim = useRef(new Animated.Value(2)).current;  // Initial row
+    const colAnim = useRef(new Animated.Value(2)).current;  // Initial col
     const getDaysInMonth = (month: number, year: number) => new Date(year, month, 0).getDate();
 
     const getDayOffset = (month: number, year: number, day: number) => {
@@ -92,76 +272,165 @@ const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }: { currentMo
         outputRange: [0, -screenWidth],
     });
 
-    return (
+    const verticalIndicators = () => {
+        return (
+            <VerticalGradientBorder
+                containerHeight={containerHeight}
+                colAnim={colAnim}
+                selectedSection={3}
+                theme={theme}
+                numRows={numRows}
+            />
+            // <Animated.View style={{
+            //     width: containerHeight,
+            //     borderLeftWidth: 1,
+            //     borderRightWidth: 1,
+            //     borderLeftColor: theme.primaryHighFade,
+            //     borderRightColor: theme.primaryHighFade,
+            //     position: "absolute",
+            //     transform: [{ translateX: value }],
+            //     height: "100%",
+            // }} />
+        )
+    }
 
-        <FlatList
-            ListHeaderComponent={() => {
-                return (
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            width: "100%",
-                            zIndex: -10,
-                            marginTop: 10
-                        }}
-                    >
-                        {oneLetterDays.map((item, index) => (
-                            <View
-                                key={index}
-                                style={{
-                                    flex: 1,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: screenWidth / 7,
-                                }}
-                            >
-                                <Text
+    const horizontalIndicators = () => {
+        const value = rowAnim.interpolate({
+            inputRange: [1, 2, 3, 4, 5, 6],
+            outputRange: Array.from({ length: 6 }, (_, i) => containerHeight * (i + 1) - (containerHeight / 2) + 4)
+        });
+        return (
+            <GradientBorder
+                containerHeight={containerHeight}
+                rowAnim={rowAnim}
+                selectedSection={3}
+                theme={theme}
+            />
+            // <Animated.View style={{
+            //     height: containerHeight,
+            //     borderTopWidth: 1,
+            //     borderBottomWidth: 1,
+            //     borderTopColor: theme.primaryHighFade,
+            //     borderBottomColor: theme.primaryHighFade,
+            //     position: "absolute",
+            //     transform: [{ translateY: value }],
+            //     width: "100%",
+            // }} />
+        )
+    }
+
+    const goIndicatorToRow = (row: number) => {
+        Animated.timing(rowAnim, {
+            toValue: row,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }
+
+    const goIndicatorToColumn = (column: number) => {
+        Animated.timing(colAnim, {
+            toValue: column,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }
+
+    return (
+        <View style={{ position: "relative" }}>
+            {horizontalIndicators()}
+            {verticalIndicators()}
+            <View style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                zIndex: 100,
+            }}>
+                <Button title="go to random row"
+                    onPress={() => {
+                        const row = Math.floor(Math.random() * numRows);
+                        goIndicatorToRow(row)
+                    }} />
+            </View>
+            <View style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                zIndex: 100,
+            }}>
+                <Button title="go to random col"
+                    onPress={() => {
+                        const col = Math.floor(Math.random() * NUM_COLUMNS);
+                        goIndicatorToColumn(col)
+                    }} />
+            </View>
+            <FlatList
+                ListHeaderComponent={() => {
+                    return (
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                width: "100%",
+                                zIndex: -10,
+                                marginTop: 10
+                            }}
+                        >
+                            {oneLetterDays.map((item, index) => (
+                                <View
+                                    key={index}
                                     style={{
-                                        color: theme.primary,
-                                        fontFamily: "Poppins-Light",
+                                        flex: 1,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        width: screenWidth / 7,
                                     }}
                                 >
-                                    {item}
-                                </Text>
-                            </View>
-                        ))}
-                    </View>
-                );
-            }}
-            renderItem={({ item }) => (
-                <Day
-                    day={item.day}
-                    isCurrentMonth={item.month === currentMonth}
-                    month={item.month}
-                    year={item.year}
-                    isToday={
-                        item.day === new Date().getDate() &&
-                        item.month === new Date().getMonth() + 1 &&
-                        item.year === new Date().getFullYear()
-                    }
-                />
-            )}
-            data={days}
-            keyExtractor={(item, index) =>
-                new Date(
-                    item.year,
-                    item.month + 1,
-                    item.day
-                ).toDateString() + index.toString()
-            }
-            numColumns={7}
-            style={{
-                alignSelf: "center",
-            }}
-            contentContainerStyle={{}}
-            scrollEnabled={false}
-            getItemLayout={(data, index) => ({
-                length: totalHeight,
-                offset: totalHeight * index,
-                index,
-            })}
-        />
-
+                                    <Text
+                                        style={{
+                                            color: theme.primary,
+                                            fontFamily: "Poppins-Light",
+                                        }}
+                                    >
+                                        {item}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    );
+                }}
+                renderItem={({ item }) => (
+                    <Day
+                        day={item.day}
+                        isCurrentMonth={item.month === currentMonth}
+                        month={item.month}
+                        year={item.year}
+                        isToday={
+                            item.day === new Date().getDate() &&
+                            item.month === new Date().getMonth() + 1 &&
+                            item.year === new Date().getFullYear()
+                        }
+                    />
+                )}
+                data={days}
+                keyExtractor={(item, index) =>
+                    new Date(
+                        item.year,
+                        item.month + 1,
+                        item.day
+                    ).toDateString() + index.toString()
+                }
+                numColumns={7}
+                style={{
+                    alignSelf: "center",
+                }}
+                contentContainerStyle={{}}
+                scrollEnabled={false}
+                getItemLayout={(data, index) => ({
+                    length: totalHeight,
+                    offset: totalHeight * index,
+                    index,
+                })}
+            />
+        </View>
     );
 };
 

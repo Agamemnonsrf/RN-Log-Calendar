@@ -26,6 +26,7 @@ import SyncedIcon from "./SyncedIcon";
 import Spinner from "./Spinner";
 import FlatListRefContext from "../context/flatListContext";
 import { Octicons } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -39,15 +40,15 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const NoteInput = forwardRef(({ }, ref) => {
     const { theme } = useContext(FlatListRefContext);
     const randomnumber = Math.floor(Math.random() * 10);
-    console.log("rerendering" + randomnumber)
     const [date, setDate] = useState(new Date());
     const [text, setText] = useState("");
     const [loading, setLoading] = useState(false);
-    const [selectedColor, setSelectedColor] = useState(theme.antithesis);
+    const [selectedColor, setSelectedColor] = useState("");
     const [focused, setFocused] = useState(false);
     const [animationPlaying, setAnimationPlaying] = useState(false);
     const [closeAnimationPlaying, setCloseAnimationPlaying] = useState(false)
     const [keyboardStatus, setKeyboardStatus] = useState(false);
+    const [isScrolling, setIsScrolling] = useState(false);
 
     useEffect(() => {
         const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -134,7 +135,7 @@ const NoteInput = forwardRef(({ }, ref) => {
         setColorRef.current = setColor;
         setDate(new Date(year, month - 1, day));
         setText(data);
-        setSelectedColor(color ? color : theme.antithesis);
+        setSelectedColor(color ? color : "");
     };
 
     useImperativeHandle(ref, () => ({
@@ -158,11 +159,11 @@ const NoteInput = forwardRef(({ }, ref) => {
             }
             if (setColorRef.current) {
                 if (text.length > 0) {
-                    setColorRef.current(selectedColor);
-                    saveColor(date, selectedColor);
+                    //console.log("setting and saving color to " + selectedColor)
+                    //saveColor(date, selectedColor);
                 } else {
-                    setColorRef.current("");
-                    saveColor(date, "");
+                    //setColorRef.current("");
+                    //saveColor(date, "");
                 }
             }
         }
@@ -245,6 +246,7 @@ const NoteInput = forwardRef(({ }, ref) => {
                         inputRange: [0, 1],
                         outputRange: [40, 70],
                     }),
+                    borderRadius: 5
                 }}
             >
                 <View
@@ -313,44 +315,58 @@ const NoteInput = forwardRef(({ }, ref) => {
                     <Octicons name="arrow-down" size={28} color={theme.primaryHighFade} />
                 </AnimatedPressable>
             </Animated.View>
-            <AnimatedTextInput
-                ref={textInputRef}
-                editable={focused}
-                multiline
-                numberOfLines={8}
-                maxLength={2000}
-                onChangeText={handleTextChange}
-                value={text}
-                style={[
-                    styles.textInput,
-                    {
-                        height: "100%",
-                        width: textInputPosition.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [textinputWidth, screenWidth],
-                        }),
-                        paddingTop: textInputPosition.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [40, 75],
-                        }),
-                        zIndex: 10,
-                        backgroundColor: theme.quaternary,
-                        color: theme.primary,
-                        textAlignVertical: "top",
-                        fontSize: 18,
-                        shadowColor: "black",
-                        shadowOffset: {
-                            width: 3,
-                            height: 2,
+            <KeyboardAwareScrollView
+                style={{ flex: 1, height: "50%" }}
+                enableAutomaticScroll={false}
+                onScroll={() => {
+                    setIsScrolling(true);
+                }}>
+                <AnimatedTextInput
+                    ref={textInputRef}
+                    editable={focused && ((!isScrolling || (textInputRef.current && textInputRef.current.isFocused())) || false)}
+                    multiline
+                    numberOfLines={8}
+                    maxLength={2000}
+                    onChangeText={handleTextChange}
+                    value={text}
+                    style={[
+                        styles.textInput,
+                        {
+                            height: "200%",
+                            maxHeight: 200,
+                            width: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [textinputWidth, screenWidth],
+                            }),
+                            paddingTop: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [40, 75],
+                            }),
+                            zIndex: 10,
+                            backgroundColor: theme.quaternary,
+                            color: theme.primary,
+                            textAlignVertical: "top",
+                            fontSize: 18,
+                            shadowColor: "black",
+                            shadowOffset: {
+                                width: 3,
+                                height: 2,
+                            },
+                            paddingBottom: textInputPosition.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [10, 620],
+                            }),
+                            shadowOpacity: 1,
+                            shadowRadius: 3.84,
+                            elevation: 5,
                         },
-                        shadowOpacity: 1,
-                        shadowRadius: 3.84,
-                        elevation: 5,
-                    },
-                ]}
-                placeholder={"Your notes here..."}
-                placeholderTextColor={theme.primaryHighFade}
-            />
+                    ]}
+                    scrollEnabled={false}
+                    placeholder={"Your notes here..."}
+                    placeholderTextColor={theme.primaryHighFade}
+                    onPressIn={() => setIsScrolling(false)}
+                />
+            </KeyboardAwareScrollView>
         </AnimatedPressable>
     );
 });

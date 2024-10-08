@@ -38,7 +38,15 @@ export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
     const position1 = useRef(new Animated.Value(0)).current;
     const returnButtonPosition = useRef(new Animated.Value(0)).current;
-    const dropDownRef = useRef();
+    const dropDownRef = useRef<{
+        showDropdown: (year: number,
+            month: number,
+            day: number,
+            data: string,
+            setHasData: (data: string) => void,
+            setColor: (color: string) => void,
+            color: string) => void
+    }>({ showDropdown: () => { console.log("not implemented") } });
     const sideMenuRef = useRef();
     const dayRef = useRef();
     const monthSelectorRef = useRef<React.ForwardedRef<{ scrollToCurr: () => void }>>();
@@ -227,7 +235,7 @@ export default function App() {
                     <Text style={{
                         color: theme.primary,
                         fontFamily: "Poppins-Regular",
-                    }}>Return To Current Month</Text>
+                    }}>Return To Current Date</Text>
                 </AnimatedTouchableOpacity>
                 <StatusBar style="light" translucent={true} />
             </View>

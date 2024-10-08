@@ -28,6 +28,7 @@ import MonthSelector from "./Components/calendar/MonthSelector";
 import YearSelector from "./Components/calendar/yearSelector";
 
 const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
     const dropDownRef = useRef();
     const sideMenuRef = useRef();
     const dayRef = useRef();
+    const monthSelectorRef = useRef<React.ForwardedRef<{ scrollToCurr: () => void }>>();
 
     const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -89,11 +91,12 @@ export default function App() {
 
     const onLayoutRootView = useCallback(async () => {
         if (appIsReady) {
+            console.log("gloo")
             await SplashScreen.hideAsync();
         }
     }, [appIsReady]);
 
-    const selectNewMonth = (newMonth) => {
+    const selectNewMonth = (newMonth: number) => {
         let previousMonth;
         setCurrentMonth((prev) => {
             previousMonth = prev;
@@ -110,7 +113,7 @@ export default function App() {
         });
     };
 
-    const selectNewYear = (newYear) => {
+    const selectNewYear = (newYear: number) => {
         let newYearCall;
         setCurrentYear((prev) => {
             newYearCall = prev;
@@ -160,7 +163,7 @@ export default function App() {
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "flex-end",
-                        zIndex: 10,
+                        zIndex: -1,
                         borderBottomWidth: 1,
                         borderBottomColor: theme.primaryHighFade,
                     }}
@@ -173,11 +176,10 @@ export default function App() {
                         <BarsMenuIcon />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: "flex-end", alignItems: "flex-end", gap: 8 }}>
-
                         <MonthSelector
-                            currentYear={currentYear}
                             currentMonth={currentMonth}
                             selectNewMonth={selectNewMonth}
+                            ref={monthSelectorRef}
                         />
                         <YearSelector currentYear={currentYear} selectNewYear={selectNewYear} />
                     </View>
@@ -198,34 +200,36 @@ export default function App() {
                         currentYear={currentYear}
                     />
                 </Animated.View>
-                <View style={{
-                    flex: 1,
-
+                <Animated.View style={{
+                    justifyContent: "flex-end",
                     alignItems: "center",
+                    width: "100%",
+                    height: "100%",
+                    bottom: 0
 
                 }}>
                     <NoteInput ref={dropDownRef} />
-                </View>
+                </Animated.View>
                 <AnimatedTouchableOpacity
                     onPress={() => {
                         //TODO: make smooth
-                        setCurrentMonth(new Date().getMonth() + 1);
-                        setCurrentYear(new Date().getFullYear());
+                        selectNewMonth(new Date().getMonth() + 1);
+                        (monthSelectorRef.current as { scrollToCurr: () => void } | null)?.scrollToCurr();
                     }}
                     style={{
                         position: "absolute",
                         bottom: -15,
                         right: 10,
                         zIndex: 100,
-                        backgroundColor: "white",
+                        backgroundColor: theme.secondary,
                         padding: 10,
                         paddingBottom: 20,
                         borderRadius: 10,
                         transform: [{ translateY: returnButtonPosition.interpolate({ inputRange: [0, 1], outputRange: [0, 100] }) }]
                     }}>
                     <Text style={{
-                        color: "black",
-                        fontFamily: "Poppins-Bold",
+                        color: theme.primary,
+                        fontFamily: "Poppins-Regular",
                     }}>Return To Current Month</Text>
                 </AnimatedTouchableOpacity>
                 <StatusBar style="light" translucent={true} />
@@ -237,7 +241,7 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: RNStatusBar.currentHeight + 10
+        paddingTop: RNStatusBar.currentHeight ? RNStatusBar.currentHeight + 10 : 10,
     },
     background: {
         position: "absolute",
@@ -245,5 +249,6 @@ const styles = StyleSheet.create({
         right: 0,
         top: 0,
         height: "120%",
+        zIndex: -2,
     },
 });

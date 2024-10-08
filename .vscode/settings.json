@@ -1,3 +1,4 @@
 {
-    "todo-tree.tree.scanMode": "workspace"
+    "todo-tree.tree.scanMode": "workspace",
+    "cmake.sourceDirectory": "/Users/aserafeim/Development/react-native/personal-projects/RN-Log-Calendar/node_modules/expo-modules-core/android"
 }

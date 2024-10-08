@@ -1,4 +1,23 @@
-const colorThemes = {
+export type ColorTheme = {
+    name: string;
+    overall: string;
+    background: string;
+    backgroundGradient: string[];
+    primary: string;
+    antithesis: string;
+    primaryLowFade: string;
+    primaryMidFade: string;
+    primaryHighFade: string;
+    primaryVeryHighFade: string;
+    secondary: string;
+    secondaryVibrant?: string;
+    tertiary: string;
+    quaternary: string;
+    quinary?: string;
+};
+
+const colorThemes: { [key: string]: ColorTheme }
+    = {
     defaultLight: {
         name: "defaultLight",
         overall: "light",
@@ -63,49 +82,6 @@ const colorThemes = {
         quaternary: "#BA55D3",
     },
 
-    enhancedDark: {
-        name: "enhancedDark",
-        overall: "dark",
-        background: "#1E1E1E",
-        backgroundGradient: ["#414857", "#2B303A"],
-        primary: "#61dafb",
-        primaryLowFade: "rgba(97,218,251,0.9)",
-        primaryMidFade: "rgba(97,218,251,0.7)",
-        primaryHighFade: "rgba(97,218,251,0.5)",
-        primaryVeryHighFade: "rgba(97,218,251,0.2)",
-        secondary: "#ff8c00",
-        tertiary: "#c71585",
-        quaternary: "#00fa9a",
-        quinary: "#2c3e5066",
-    },
-    midnightBlue: {
-        name: "midnightBlue",
-        overall: "dark",
-        background: "#191970",
-        primary: "#00ced1",
-        backgroundGradient: ["#414857", "#2B303A"],
-        primaryLowFade: "rgba(0,206,209,0.9)",
-        primaryMidFade: "rgba(0,206,209,0.7)",
-        primaryHighFade: "rgba(0,206,209,0.5)",
-        primaryVeryHighFade: "rgba(0,206,209,0.2)",
-        secondary: "#4169e1",
-        tertiary: "#9932cc",
-        quaternary: "#8a2be2",
-    },
-    charcoalGray: {
-        name: "charcoalGray",
-        overall: "dark",
-        background: "#2F4F4F",
-        backgroundGradient: ["#414857", "#2B303A"],
-        primary: "#dcdcdc",
-        primaryLowFade: "rgba(220,220,220,0.9)",
-        primaryMidFade: "rgba(220,220,220,0.7)",
-        primaryHighFade: "rgba(220,220,220,0.5)",
-        primaryVeryHighFade: "rgba(220,220,220,0.2)",
-        secondary: "#778899",
-        tertiary: "#696969",
-        quaternary: "#808080",
-    },
 
     // Add more color themes here
 };

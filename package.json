@@ -9,23 +9,23 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/webpack-config": "^19.0.0",
-    "@react-native-async-storage/async-storage": "1.18.2",
-    "expo": "~49.0.15",
-    "expo-font": "~11.4.0",
-    "expo-linear-gradient": "~12.3.0",
-    "expo-splash-screen": "~0.20.5",
-    "expo-status-bar": "~1.6.0",
+    "@expo/webpack-config": "~19.0.1",
+    "@react-native-async-storage/async-storage": "1.21.0",
+    "expo": "^50.0.17",
+    "expo-font": "~11.10.3",
+    "expo-linear-gradient": "~12.7.2",
+    "expo-splash-screen": "~0.26.4",
+    "expo-status-bar": "~1.11.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-native": "0.72.6",
+    "react-native": "0.73.6",
     "react-native-web": "~0.19.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/node": "^20.12.7",
-    "@types/react": "^18.2.76",
-    "@types/react-dom": "^18.2.25",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "~18.0.10",
     "typescript": "^5.4.5"
   },
   "private": true

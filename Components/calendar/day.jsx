@@ -192,7 +192,6 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }) => {
                     {isToday && (
                         <View
                             style={{
-                                position: "absolute",
                                 bottom: -1,
                                 zIndex: 10,
                             }}

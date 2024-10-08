@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, memo, useState } from "react";
+import React, { useEffect, useRef, useContext, memo, useState, forwardRef, useImperativeHandle } from "react";
 import {
     View,
     Text,
@@ -35,51 +35,65 @@ const months = [
 ];
 
 
-export default MonthSelector = ({
-    currentYear,
+type MonthSelectorProps = {
+    currentMonth: number;
+    selectNewMonth: (month: number) => void;
+};
+
+const MonthSelector = forwardRef(({
     currentMonth,
-    decideMonthForArray,
     selectNewMonth,
-}) => {
+}: MonthSelectorProps, ref) => {
     const { theme } = useContext(FlatListRefContext);
     const heightRef = useRef(new Animated.Value(0)).current;
-    const flatListRef = useRef();
+    const flatListRef = useRef<FlatList | null>(null);
+    const prevMonthRef = useRef(currentMonth);
     const [showingMenu, setShowingMenu] = useState({ state: false, month: 0 });
+    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
     const interpolatedHeight = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: [45, 200],
+        outputRange: [50, 200],
     });
 
-    const interpolatedWidth = heightRef.interpolate({
-        inputRange: [0, 1],
-        outputRange: [
-            "65%",
-            "65%",
-        ],
-    });
+    useImperativeHandle(ref, () => ({
+        scrollToCurr
+    }));
 
-
+    const scrollToCurr = () => {
+        flatListRef.current && flatListRef.current.scrollToIndex({
+            index: ((new Date().getMonth() + 1) - 1) + 12 * 500,
+            animated: true,
+        });
+    };
 
     const interpolatedBackgroundColor = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: ["rgba(50, 50, 50, 0)", "rgba(50, 50, 50, 1)"],
+        outputRange: ["rgba(50, 50, 50, 0.6)", "rgba(50, 50, 50, 1)"],
     });
 
-    const renderItem = ({ item, index }) => {
+    const renderItem = (item: number, index: number) => {
+
         return (
-            <Pressable
+            <AnimatedPressable
                 onPress={() => {
                     setShowingMenu((prev) => {
+                        prevMonthRef.current = index;
                         return { state: !prev.state, month: item, index };
                     });
                 }}
                 style={{
                     width: "100%",
+                    paddingHorizontal: 6,
                     alignItems: "center",
                     height: 50,
                     //TODO: maybe add some extra margin to january and december
                     marginBottom: 10,
+                    backgroundColor: (index % 12) + 1 === currentMonth ? heightRef.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["transparent", theme.secondary],
+                    }) : 'transparent',
+                    borderRadius: 10,
                 }}
             >
                 <Text
@@ -95,7 +109,7 @@ export default MonthSelector = ({
                 >
                     {item}
                 </Text>
-            </Pressable>
+            </AnimatedPressable>
         );
     };
 
@@ -106,39 +120,44 @@ export default MonthSelector = ({
             firstRender.current = false;
         } else {
             if (showingMenu.state) {
-                showMenu(showingMenu.index);
+                showMenu(showingMenu.month);
             } else {
-                hideMenu(showingMenu.index);
+                hideMenu(showingMenu.month);
             }
         }
     }, [showingMenu]);
 
-    const showMenu = (month) => {
-        Animated.parallel([Animated.spring(heightRef, {
-            toValue: 1,
-            useNativeDriver: false,
-        }).start(),
-        flatListRef.current.scrollToIndex({
-            index: month - 1,
-            animated: true,
-        })])
-    };
-
-    const hideMenu = (month) => {
-        console.log(month)
-        Animated.parallel([
-            Animated.spring(heightRef, {
-                toValue: 0,
+    const showMenu = (month: number) => {
+        if (flatListRef.current) {
+            Animated.parallel([Animated.spring(heightRef, {
+                toValue: 1,
                 useNativeDriver: false,
             }),
             flatListRef.current.scrollToIndex({
-                index: month,
+                index: month - 1,
                 animated: true,
-            }),
-        ]).start();
-        setTimeout(() => {
-            selectNewMonth(month % 12 + 1);
-        }, 300)
+            }) as unknown as Animated.CompositeAnimation
+            ])
+        }
+    };
+
+    const hideMenu = (month: number) => {
+        console.log(month)
+        if (flatListRef.current) {
+            Animated.parallel([
+                Animated.spring(heightRef, {
+                    toValue: 0,
+                    useNativeDriver: false,
+                }),
+                flatListRef.current.scrollToIndex({
+                    index: month,
+                    animated: true,
+                }) as unknown as Animated.CompositeAnimation,
+            ]).start();
+            setTimeout(() => {
+                selectNewMonth(month % 12 + 1);
+            }, 300)
+        }
     };
 
     return (
@@ -147,10 +166,8 @@ export default MonthSelector = ({
                 height: interpolatedHeight,
                 backgroundColor: interpolatedBackgroundColor,
                 borderRadius: 10,
-                zIndex: 51,
-                paddingHorizontal: 16,
-                borderWIdth: 2,
-                borderColor: 'green',
+                zIndex: 1,
+                paddingHorizontal: 10,
                 overflow: 'visible'
             }}
         >
@@ -166,17 +183,17 @@ export default MonthSelector = ({
                 keyExtractor={(item, index) => item + index}
                 contentContainerStyle={{}}
                 initialScrollIndex={(currentMonth - 1) + 12 * 500}
-                renderItem={(item, index) => renderItem(item, index)}
+                renderItem={({ item, index }) => renderItem(item, index)}
                 ListFooterComponent={() => {
                     return <View style={{ height: 100 }} />;
                 }}
             />
         </Animated.View>
-
     );
-};
+})
 {
     /* {new Date(
                         Date.UTC(currentYear, decideMonthForArray(currentMonth))
                     ).toLocaleDateString(undefined, { month: "long" })} */
 }
+export default MonthSelector

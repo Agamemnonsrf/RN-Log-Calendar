@@ -18,30 +18,30 @@ const screenHeight =
 const screenWidth = Dimensions.get("window").width;
 const oneLetterDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }) => {
+const CurrentMonth = ({ currentMonth, setCurrentYear, currentYear }: { currentMonth: number, setCurrentYear: Function, currentYear: number }) => {
     const { theme } = useContext(FlatListRefContext);
     const focusPanRef = useRef(new Animated.Value(0)).current;
 
-    const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
+    const getDaysInMonth = (month: number, year: number) => new Date(year, month, 0).getDate();
 
-    const getDayOffset = (month, year, day) => {
+    const getDayOffset = (month: number, year: number, day: number) => {
         let dayOfWeek = new Date(year, month - 1, day).getDay() - 1;
         return dayOfWeek === -1 ? 6 : dayOfWeek;
     };
 
-    const getStartingDayOffset = (month, year) => getDayOffset(month, year, 1);
+    const getStartingDayOffset = (month: number, year: number) => getDayOffset(month, year, 1);
 
-    const getEndingDayOffset = (month, year) =>
+    const getEndingDayOffset = (month: number, year: number) =>
         getDayOffset(month, year, getDaysInMonth(month, year));
 
-    const decideMonth = (month, offset) => {
+    const decideMonth = (month: number, offset: number) => {
         const adjustedMonth = month + offset;
         if (adjustedMonth === 0) return 12;
         if (adjustedMonth === 13) return 1;
         return adjustedMonth;
     };
 
-    const decideMonthForArray = (month) => {
+    const decideMonthForArray = (month: number) => {
         if (month === 12) return 11;
         if (month === -1) return 0;
         return month - 1;

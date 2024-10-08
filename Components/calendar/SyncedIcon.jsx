@@ -13,12 +13,15 @@ export default SyncedIcon = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 alignSelf: "flex-end",
+                backgroundColor: theme.primaryVeryHighFade,
+                paddingHorizontal: 8,
+                borderRadius: 100,
                 gap: 3
             }}
         >
             <Text
                 style={{
-                    color: theme.primaryHighFade,
+                    color: theme.primaryMidFade,
                     fontFamily: "Poppins-Medium",
                 }}
             >

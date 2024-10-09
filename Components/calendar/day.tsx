@@ -76,29 +76,32 @@ function isDarkColor(hex: string) {
     const luminance = getLuminance(r, g, b);
 
     // Compare luminance to 0.5 (midpoint) to determine if it's dark or light
-    return luminance < 0.3;
+    return luminance < 0.4;
 }
 
 
 
 const coolors = [
-    "#EEC643",
-    "#141414",
-    "#EEF0F2",
-    "#0D21A1",
     "#13C4A3",
-    "#E4BE9E",
-    "#F2F6D0",
+    "#EEC643",
     "#CA3C25",
-    "#BE3E82",
+    "#EEF0F2",
+    "#5887FF",
+    "#E4BE9E",
+    "#FF8C61",
+    "#475590",
     "#B96D40",
 ];
 
-const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCurrentMonth: boolean, month: number, isToday: boolean, year: number }) => {
+const Day = ({ day, isCurrentMonth, month, isToday, year, row, col, setSelectedCol, setSelectedRow }: {
+    day: number, isCurrentMonth: boolean, month: number, isToday: boolean, year: number, row: number, col: number,
+    setSelectedCol: React.Dispatch<React.SetStateAction<number>>,
+    setSelectedRow: React.Dispatch<React.SetStateAction<number>>
+}) => {
     const { dropDownRef, theme } = useContext(FlatListRefContext);
     const [hasData, setHasData] = useState("");
     const [color, setColor] = useState("");
-
+    const colorScrollViewRef = useRef<ScrollView | null>(null);
     const AnimatedTouchableOpacity =
         Animated.createAnimatedComponent(TouchableOpacity);
     const colorSelectorRef = useRef(new Animated.Value(0)).current;
@@ -107,7 +110,14 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
         Animated.spring(colorSelectorRef, {
             toValue: 1,
             useNativeDriver: false,
-        }).start();
+        }).start(() => {
+            if (color !== "")
+                colorScrollViewRef.current?.scrollTo({
+                    x:
+                        coolors.indexOf(color) * 35 + 70
+                    , y: 0, animated: true
+                });
+        });
     };
 
     const hideColorSelector = () => {
@@ -118,9 +128,6 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
     };
 
     const getColor = async () => {
-        if (day === 11) {
-            console.log("bombo", color)
-        }
         try {
             const value = await AsyncStorage.getItem(
                 new Date(year, month - 1, day).toDateString() + "color"
@@ -134,7 +141,6 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
     };
 
     const saveColor = async (date: Date, color: string) => {
-
         try {
             await AsyncStorage.setItem(date.toDateString() + "color", color);
         } catch (e) {
@@ -197,7 +203,6 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                     },
                 ]}
             >
-
                 <Animated.View
                     style={{
                         height: interpolatedColorSelectorHeight,
@@ -225,6 +230,9 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                             paddingHorizontal: 80,
                         }}
                         showsHorizontalScrollIndicator={false}
+                        snapToStart
+                        contentOffset={{ x: 70, y: 0 }}
+                        ref={colorScrollViewRef}
                     >
                         <AnimatedTouchableOpacity
                             key={"close color selector"}
@@ -270,7 +278,6 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                                 color={theme.primary}
                             />}
                         </AnimatedTouchableOpacity>
-
                         {coolors.map((coolor) => (
                             <AnimatedTouchableOpacity
                                 key={coolor}
@@ -279,13 +286,32 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                                     height: interpolatedColorHeight,
                                     borderRadius: 100,
                                     backgroundColor: coolor,
+                                    position: "relative"
                                 }}
                                 onPress={() => {
                                     setColor(coolor);
                                     saveColor(new Date(year, month - 1, day), coolor);
                                     hideColorSelector();
                                 }}
-                            />
+                            >
+                                {coolor === color &&
+                                    <View key={coolor + "indicator"} style={{
+                                        position: "absolute",
+                                        width: 25,
+                                        height: 25,
+                                        borderRadius: 100,
+                                        borderWidth: 2,
+                                        borderColor: theme.primary,
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        alignSelf: "center",
+                                    }}>
+                                        <MaterialIcons
+                                            name="check"
+                                            size={12}
+                                            color={isDarkColor(coolor) ? theme.primary : theme.background} />
+                                    </View>}
+                            </AnimatedTouchableOpacity>
                         ))}
                     </ScrollView>
                 </Animated.View>
@@ -294,8 +320,8 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                     style={{
                         justifyContent: "center",
                         alignItems: "center",
-                        width: 30,
-                        height: 30,
+                        width: 33,
+                        height: 33,
                         backgroundColor: color !== "" ? color : "transparent",
                         borderRadius: 5,
                         overflow: "hidden",
@@ -310,6 +336,10 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                             setColor,
                             color
                         );
+                        //find the row and column for this day:
+                        setSelectedCol(col);
+                        setSelectedRow(row);
+                        console.log(row, col);
                     }}
                     onLongPress={() => showColorSelector()}
                 >
@@ -324,7 +354,7 @@ const Day = ({ day, isCurrentMonth, month, isToday, year }: { day: number, isCur
                         >
                             <MaterialIcons
                                 name="today"
-                                size={10}
+                                size={9}
                                 color={color ? isDarkColor(color) ? "white" : "black" : theme.primary}
                             />
                         </View>

@@ -57,7 +57,7 @@ export default MonthSelector = ({
 
     const interpolatedBackgroundColor = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: ["rgba(50, 50, 50, 0)", "rgba(50, 50, 50, 1)"],
+        outputRange: ["transparent", theme.quinary1opacity],
     });
 
     const renderItem = ({ item, index }) => {
@@ -74,19 +74,42 @@ export default MonthSelector = ({
                     justifyContent: "center",
                     height: 50,
                     marginBottom: 0,
+                    // backgroundColor: heightRef.interpolate({
+                    //     inputRange: [0, 1],
+                    //     outputRange: ["transparent", theme.secondary],
+                    // })
+                    // backgroundColor: item === new Date().getFullYear()
+                    //     ? theme.secondary : "transparent"
+
                 }}
             >
-                <Text
-                    style={[
-                        {
-                            color: theme.primary,
-                            fontFamily: "Poppins-Regular",
-                            fontSize: 21,
-                        },
-                    ]}
-                >
-                    {index}
-                </Text>
+                <Animated.View style={{
+                    width: heightRef.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["100%", "80%"],
+                    }),
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 50,
+                    marginBottom: 0,
+                    borderRadius: 10,
+                    backgroundColor: index === currentYear ? heightRef.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["transparent", theme.secondary],
+                    }) : "transparent"
+                }}>
+                    <Text
+                        style={[
+                            {
+                                color: theme.primary,
+                                fontFamily: "Poppins-Regular",
+                                fontSize: 21,
+                            },
+                        ]}
+                    >
+                        {index}
+                    </Text>
+                </Animated.View>
             </Pressable>
         );
     };
@@ -98,22 +121,22 @@ export default MonthSelector = ({
             firstRender.current = false;
         } else {
             if (showingMenu.state) {
-                showMenu();
+                showMenu(showingMenu.index);
             } else {
                 hideMenu(showingMenu.index);
             }
         }
     }, [showingMenu]);
 
-    const showMenu = () => {
+    const showMenu = (year = 0) => {
         Animated.spring(heightRef, {
             toValue: 1,
             useNativeDriver: false,
         }).start();
-        // flatListRef.current.scrollToIndex({
-        //     index: months.indexOf(showingMenu.month) - 2,
-        //     animated: true,
-        // });
+        flatListRef.current.scrollToIndex({
+            index: year - 1,
+            animated: true,
+        });
     };
 
     const hideMenu = (year = 0) => {

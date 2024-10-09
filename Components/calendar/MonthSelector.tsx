@@ -7,7 +7,7 @@ import {
     Dimensions,
     StyleSheet,
     PanResponder,
-    Pressable, StatusBar as RNStatusBar
+    Pressable, StatusBar as RNStatusBar, TouchableOpacity
 } from "react-native";
 import Day from "./day";
 import YearSelector from "./yearSelector";
@@ -44,7 +44,7 @@ export default MonthSelector = forwardRef(({
     const flatListRef = useRef();
     const prevMonthRef = useRef(currentMonth);
     const [showingMenu, setShowingMenu] = useState({ state: false, month: 0 });
-    const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+    const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
     const interpolatedHeight = heightRef.interpolate({
         inputRange: [0, 1],
@@ -64,13 +64,13 @@ export default MonthSelector = forwardRef(({
 
     const interpolatedBackgroundColor = heightRef.interpolate({
         inputRange: [0, 1],
-        outputRange: ["rgba(50, 50, 50, 0.6)", "rgba(50, 50, 50, 1)"],
+        outputRange: [theme.quinary06opacity || "rgba(50, 50, 50, 0.6)", theme.quinary1opacity || "rgba(50, 50, 50, 0.1)"],
     });
 
     const renderItem = ({ item, index }) => {
 
         return (
-            <AnimatedPressable
+            <AnimatedTouchableOpacity
                 onPress={() => {
                     setShowingMenu((prev) => {
                         prevMonthRef.current = prev.index;
@@ -104,7 +104,7 @@ export default MonthSelector = forwardRef(({
                 >
                     {item}
                 </Text>
-            </AnimatedPressable>
+            </AnimatedTouchableOpacity>
         );
     };
 

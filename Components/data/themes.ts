@@ -13,7 +13,8 @@ export type ColorTheme = {
     secondaryVibrant?: string;
     tertiary: string;
     quaternary: string;
-    quinary?: string;
+    quinary06opacity?: string;
+    quinary1opacity?: string;
 };
 
 const colorThemes: { [key: string]: ColorTheme }
@@ -49,7 +50,8 @@ const colorThemes: { [key: string]: ColorTheme }
         secondaryVibrant: "#009DFF",
         tertiary: "#62666e",
         quaternary: "#1A1A1A",
-        quinary: "#2c3e5066",
+        quinary06opacity: "rgba(50, 50, 50, 0.6)",
+        quinary1opacity: "rgba(50, 50, 50, 1)",
     },
     autumnLight: {
         name: "autumnLight",

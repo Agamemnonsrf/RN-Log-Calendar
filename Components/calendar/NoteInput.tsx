@@ -223,18 +223,12 @@ const NoteInput = forwardRef(({ }, ref) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    backgroundColor: textInputPosition.interpolate({
+                    backgroundColor: theme.quaternary,
+                    borderBottomColor: textInputPosition.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [theme.quaternary, theme.background]
+                        outputRange: ["transparent", theme.primaryHighFade],
                     }),
-                    borderBottomLeftRadius: textInputPosition.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, 10]
-                    }),
-                    borderBottomRightRadius: textInputPosition.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, 10]
-                    }),
+                    borderBottomWidth: 1,
                     width: textInputPosition.interpolate({
                         inputRange: [0, 1],
                         outputRange: [textinputWidth, screenWidth],

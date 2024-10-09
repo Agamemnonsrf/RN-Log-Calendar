@@ -246,7 +246,7 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: RNStatusBar.currentHeight ? RNStatusBar.currentHeight + 10 : 10,
+        paddingTop: RNStatusBar.currentHeight ? RNStatusBar.currentHeight + 20 : 15,
     },
     background: {
         position: "absolute",
